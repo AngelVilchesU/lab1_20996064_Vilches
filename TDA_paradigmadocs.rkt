@@ -15,15 +15,10 @@
 ; Adicional: Lo citado: "(string X string X integer X integer X integer)", corresponde a listas inicialmente nulas que contemplarán los usuarios,...
 ;            ... contraseñas y fechas de creación. Del mismo modo, "(string X integer)" corresponde al usuario y si se encuentra activo o no.
 
-; Función otorgada en el enunciado del proyecto
-(define encryptFn (lambda (s) (list->string (reverse (string->list s)))))
-
 (define paradigmadocs
   (lambda (nombre dia mes año EncryptFunction DecryptFunction)
    (list nombre dia mes año EncryptFunction DecryptFunction '() '()
   )))
-
-
 
 ; Selectores:
 ; Descripición: Capa que permite la obtención de determinado elemento en paradigmadocs
@@ -45,10 +40,16 @@
         )))
 
 ; Modificador 
+; Descripción: Permite 
 
-
-
-
+#|
+(define set-usuario-contraseña-fecha
+  (lambda (paradigmadocs usuario contraseña dia mes año)
+    (if (null? (get-dato paradigmadocs 6))
+        (list usuario contraseña dia mes año)
+        (list (car paradigmadocs) (set-usuario-contraseña-fecha (cdr paradigmadocs) set-usuario-contraseña-fecha))
+        )))
+|#
 
 
 
@@ -68,13 +69,19 @@
 #|
 EJEMPLOS CONSTRUCTOR:
 (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn)
+(paradigmadocs "gWord" 17 10 2021 encryptFn encryptFn)
+(paradigmadocs "gTXT" 18 10 2021 encryptFn encryptFn)
 
 
 EJEMPLOS SELECTOR:
-(get-dato (list "gDocs" 16 10 2021 encryptFn encryptFn '() '() '() '()) 0)
-(get-dato (list "gDocs" 16 10 2021 encryptFn encryptFn '() '() '() '()) 1)
-(get-dato (list "gDocs" 16 10 2021 encryptFn encryptFn '() '() '() '()) 6)
+(get-dato (list "gDocs" 16 10 2021 encryptFn encryptFn '() '()) 0)
+(get-dato (list "gWord" 16 10 2021 encryptFn encryptFn '() '()) 1)
+(get-dato (list "gTXT" 16 10 2021 encryptFn encryptFn '("Laysa" "A" 17 10 2021) '()) 6) ; Luego de aplicar el tercer ejemplo del siguiente tópico
 
+EJEMPLOS MODIFICADOR:
+(set-usuario-contraseña-fecha (list "gDocs" 16 10 2021 encryptFn encryptFn '() '()) "Angel" "contraseña" 17 10 2021)
+(set-usuario-contraseña-fecha (list "gWord" 17 10 2021 encryptFn encryptFn '() '()) "Milky" "guau" 17 10 2021)
+(set-usuario-contraseña-fecha (list "gTXT" 18 10 2021 encryptFn encryptFn '() '()) "Laysa" "A" 17 10 2021)
 
 
 
