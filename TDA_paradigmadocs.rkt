@@ -43,12 +43,7 @@
 ; Descripción: Permite 
 
 #|
-(define set-usuario-contraseña-fecha
-  (lambda (paradigmadocs usuario contraseña dia mes año)
-    (if (null? (get-dato paradigmadocs 6))
-        (list usuario contraseña dia mes año)
-        (list (car paradigmadocs) (set-usuario-contraseña-fecha (cdr paradigmadocs) set-usuario-contraseña-fecha))
-        )))
+
 |#
 
 
@@ -68,9 +63,9 @@
 
 #|
 EJEMPLOS CONSTRUCTOR:
-(paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn)
-(paradigmadocs "gWord" 17 10 2021 encryptFn encryptFn)
-(paradigmadocs "gTXT" 18 10 2021 encryptFn encryptFn)
+(paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") ; Las funciones "encryptFn" deben ser llamadas sin parentesis (procedimiento) una vez realizada la función
+(paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") ;
+(paradigmadocs "gTXT" 18 10 2021 "encryptFn" "encryptFn") ;
 
 
 EJEMPLOS SELECTOR:
