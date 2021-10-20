@@ -33,23 +33,77 @@
     (if (list? fecha)
         (if (= (length fecha) 3)
             (if (and (integer? (car fecha)) (integer? (car (cdr fecha))) (integer? (car (cdr (cdr fecha)))))
-                #t
+                (if (and (integer? (car fecha)) (> (car fecha) 0))
+                    (if (and (integer? (car (cdr fecha))) (< (car (cdr fecha)) 13) (> (car (cdr fecha)) 0))
+                        (if (and (integer? (car (cdr (cdr fecha)))) (> (car (cdr (cdr fecha))) 2020))
+                            #t
+                            #f)
+                        #f)
+                    #f)
                 #f)
             #f)
-        #f)))
+        #f)
+    ))
 
+; Selectores (es importante destacar que no se emplean filtros verificadores de datos ya que se encuentran...
+; ... en las funciones contructor y pertenencia las cuales deben ejecutarse previamente a los selectores):
+; Descripción: Función que permite la obtención del día registrado
+; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Recorrido: Entero correspondiente al día
 
+(define get-dia
+  (lambda (fecha)
+    (car fecha)))
 
+; Descripción: Función que permite la obtención del mes registrado
+; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Recorrido: Entero correspondiente al mes
 
+(define get-mes
+  (lambda (fecha)
+    (car (cdr fecha))))
 
+; Descripción: Función que permite la obtención del año registrado
+; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Recorrido: Entero correspondiente al año
 
+(define get-año
+  (lambda (fecha)
+    (car (cdr (cdr fecha)))))
 
+; Modificadores:
+; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
+;              ... cambiando el dato correspondiente, en este caso, el día
+; Dominio: Lista correspondiente a la fecha a modificar y el día a registrar
+; Recorrido: Lista correspondiente a la fecha ya modificada (dia)
 
+(define set-dia
+  (lambda (fecha nuevo-dia)
+    (if (fecha? (list nuevo-dia (get-mes fecha) (get-año fecha)))
+        (list nuevo-dia (get-mes fecha) (get-año fecha))
+              #f)))
 
+; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
+;              ... cambiando el dato correspondiente, en este caso, el mes
+; Dominio: Lista correspondiente a la fecha a modificar y el mes a registrar
+; Recorrido: Lista correspondiente a la fecha ya modificada (mes)
 
+(define set-mes
+  (lambda (fecha nuevo-mes)
+    (if (fecha? (list (get-dia fecha) nuevo-mes (get-año fecha)))
+        (list (get-dia fecha) nuevo-mes (get-año fecha))
+              #f)))
 
+; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
+;              ... cambiando el dato correspondiente, en este caso, el año
+; Dominio: Lista correspondiente a la fecha a modificar y el año a registrar
+; Recorrido: Lista correspondiente a la fecha ya modificada (año)
 
-
+(define set-año
+  (lambda (fecha nuevo-año)
+    (if (fecha? (list (get-dia fecha) (get-mes fecha) nuevo-año))
+        (list (get-dia fecha) (get-mes fecha) nuevo-año)
+              #f)))
 
 ; Otras funciones:
 
@@ -73,13 +127,6 @@
           (if (bisiesto? año) 29 28)
           30)))
 
-
-
-
-
-
-
-
 #|
 ------------------------------------------------------------------------------------------------------
 EJEMPLOS CONSTRUCTOR:
@@ -92,6 +139,27 @@ EJEMPLOS PERTENENCIA:
 (fecha? (list 22 11 2021))
 (fecha? (list 18 10 2021 0)) ;Este ejemplo expresa una situación no valida ya que no se respeta el formato fecha DD MM AA como lista de enteros
 
+EJEMPLOS SELECTORES:
+(get-dia (list 18 10 2021))
+(get-dia (list 22 11 2021))
+(get-dia (list 24 12 2021))
+(get-mes (list 18 10 2021))
+(get-mes (list 22 11 2021))
+(get-mes (list 24 12 2021))
+(get-año (list 18 10 2022))
+(get-año (list 18 10 2023))
 
-
+EJEMPLOS MODIFICADORES:
+(set-dia (list 18 10 2021) 20)
+(set-dia (list 18 10 2021) 30)
+(set-dia (list 18 10 2021) 0) ;Este ejemplo expresa una situación no valida ya que no existe este día (tambien aplica al limite de dias de determinado mes sea bisiesto o no)
+(set-mes (list 18 10 2021) 2)
+(set-mes (list 18 10 2021) 12)
+(set-mes (list 18 10 2021) 13) ;Este ejemplo expresa una situación no valida ya que no existe este mes
+(set-año (list 18 10 2021) 2022)
+(set-año (list 18 10 2021) 2024)
+(set-año (list 18 10 2021) 2020) ;Este ejemplo expresa una situación no valida ya que el año ya no aplica (actualizable)
+------------------------------------------------------------------------------------------------------
 |#
+
+(provide (all-defined-out))
