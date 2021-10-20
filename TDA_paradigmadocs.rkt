@@ -50,12 +50,12 @@
 
 (define get-dato
   (lambda (paradigmadocs n)
-    (if (< n (length paradigmadocs))
-        (if (= n 0)
-            (car paradigmadocs)
-            (get-dato (cdr paradigmadocs) (- n 1)))
-        #f
-        )))
+  
+    (if (= n 0)
+        (car paradigmadocs)
+        (get-dato (cdr paradigmadocs) (- n 1)))
+        
+    ))
 
 ; Modificador 
 ; Descripción: Permite la inserción de un elemento/lista en el final de la plataforma paradigmadocs
@@ -73,21 +73,23 @@
         (cons (car paradigmadocs) (set-elemento (cdr paradigmadocs) elemento))
         )))
 
+
+
 #|
-EJEMPLOS CONSTRUCTOR:
+;EJEMPLOS CONSTRUCTOR:
 (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") ; Las funciones "encryptFn" deben ser llamadas sin comillas (procedimiento) una vez realizada la función enriptadora
 (paradigmadocs "gWord" 17 10 2021 "encryptFn" "encryptFn") ;
 (paradigmadocs "gTXT" 18 10 2021 "encryptFn" "encryptFn") ;
 
-EJEMPLOS PERTENENCIA:
+;EJEMPLOS PERTENENCIA:
 PENDIENTE HASTA LA REALIZACIÓN DE LA FUNCIÓN ENCRIPTADORA, sin emabargo, es funcional
 
-EJEMPLOS SELECTOR:
+;EJEMPLOS SELECTOR:
 (get-dato '("gDocs" (16 10 2021) "encryptFn" "encryptFn" () ()) 0)
 (get-dato '("gWord" (17 10 2021) "encryptFn" "encryptFn" () ()) 1)
 (get-dato '("gTXT" (18 10 2021) "encryptFn" "encryptFn" () ()) 5)
 
-EJEMPLOS MODIFICADOR:
+;EJEMPLOS MODIFICADOR:
 (set-elemento (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") "algún string o entero")
 (set-elemento (paradigmadocs "gWord" 17 10 2021 "encryptFn" "encryptFn") "alguna función (sin comillas)")
 (set-elemento (paradigmadocs "gTXT" 18 10 2021 "encryptFn" "encryptFn") (list))

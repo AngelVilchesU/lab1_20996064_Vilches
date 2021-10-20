@@ -2,6 +2,7 @@
 
 (require "TDA_paradigmadocs.rkt")
 (require "TDA_fecha.rkt")
+(require "TDA_usuarios.rkt")
 
 ; Implementación de los requisitos funcionales
 
@@ -16,22 +17,17 @@
 
 (define register
   (lambda (paradigmadocs dia mes año usuario contraseña)
-    (if (fecha? (crear-fecha dia mes año))
-        (if (null? (get-dato paradigmadocs 6))
-        (list usuario contraseña (crear-fecha dia mes año))
-        (list (car paradigmadocs) (register (cdr (get-dato paradigmadocs 6)) dia mes año usuario contraseña))
-            )#f)))
-
+    (if (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #f)    
+       (modificar-lista-usuarios paradigmadocs (crear-usuario dia mes año usuario contraseña))
+       paradigmadocs)))
+       
 
 
 #|
 EJEMPLOS register:
-(register '("gDocs" 16 10 2021 "encryptFn" "encryptFn" () ()) 17 10 2021 "Angel" "contraseña") ; Las funciones "encryptFn" deben ser llamadas sin comillas (procedimiento) una vez realizada la función enriptadora
-(register '("gWord" 17 10 2021 "encryptFn" "encryptFn" () ()) 19 11 2021 "Milky" "guau")
-(register '("gTXT" 18 10 2021 "encryptFn" "encryptFn" () ()) 27 13 2021 "Laysa" "A") ; Este ejemplo expresa una situación no valida pues la fecha posee inconsistencias graves
-
-
-
+(register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") ; Las funciones "encryptFn" deben ser llamadas sin comillas (procedimiento) una vez realizada la función enriptadora
+(register (register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") 19 11 2021 "Milky" "guau")
+(register (register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") 19 11 2021 "Angel" "cerealTrix") ; Este ejemplo expresa una situación no valida pues el nombre de usuario ya existe
 
 
 |#

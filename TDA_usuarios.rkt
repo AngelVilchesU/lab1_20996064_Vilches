@@ -1,6 +1,7 @@
 #lang racket
 
 (require "TDA_fecha.rkt")
+(require "TDA_paradigmadocs.rkt")
 
 ; Implementación del TDA usuarios
 
@@ -34,7 +35,7 @@
                 #f)
         #f)#f)))
 
-; Selección:
+; Selector:
 ; Descripción: Función que permite obtener la fecha registrada
 ; Dominio: Lista de información del usuario
 ; Recorrido: Fecha registrada
@@ -82,9 +83,42 @@
         (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) nueva-contraseña)
         #f)))
 
+; Otras funciones:
+; Descripción: Función que permite modificar la lista de usuarios creada en la plataforma diseñada (posición Nro. 4) recibiendo como...
+;              ... parametros de entrada la plataforma y la lista contenedora de la información de un nuevo usuario para, en paralelo...
+;              ... con la función denominada "set-lista-usuarios" insertarla dentro como lista obteniendo a nivel de plataforma en...
+;              ... la posición número 4 una lista de listas correspondiente a la información de un usuario
+; Dominio: paradigmadocs X list
+; Recorrido: Actualización de paradigmadocs
+
+(define modificar-lista-usuarios
+  (lambda (plataforma lista-info-usuarios)
+    (list (get-dato plataforma 0) (get-dato plataforma 1) (get-dato plataforma 2) (get-dato plataforma 3) (set-lista-usuarios (get-dato plataforma 4) lista-info-usuarios) (get-dato plataforma 5)
+    )))
+
+; Descripción: Función que permite unir dos listas mediante la función "append", se aplica de forma complementaria a la función anterior
+; Dominio: list X nueva-lista
+; Recorrido: Unión de listas como listas de listas
+
+(define set-lista-usuarios
+  (lambda (lista nueva-lista)
+    (append lista (list nueva-lista))
+  ))
+
+; Descripción: Función que permite realizar una veríficación de la existencia (o no) de un usuario determinado mediante recursión natural/linea
+; Dominio: Lista X usuario
+; Recorrido: 
+
+(define usuario-repetido?
+  (lambda (lista-info-usuarios usuario)
+    (if (null? lista-info-usuarios) #f
+        (if (equal? usuario (get-usuario (car lista-info-usuarios))) #t
+            (if (null? (cdr lista-info-usuarios)) #f
+                (usuario-repetido? (cdr lista-info-usuarios) usuario))
+            ))))
 
 
-
+#|
 
 ;EJEMPLOS CONSTRUCTOR:
 (crear-usuario 19 10 2021 "Angel" "contraseña")
@@ -94,12 +128,55 @@
 ;EJEMPLOS PERTENENCIA:
 (usuario? (crear-usuario 19 10 2021 "Angel" "contraseña"))
 (usuario? (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
-(usuario? (crear-usuario 21 12 2021 "Fifi" "tostador"))
+(usuario? (crear-usuario 21 12 2021 1 "tostador")) ;Este ejemplo expresa una situación no valida ya que el usuario no es valido (integer)
 
 ;EJEMPLOS SELECTOR:
 (get-fecha (crear-usuario 19 10 2021 "Angel" "contraseña"))
 (get-fecha (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
 (get-fecha (crear-usuario 21 12 2021 "Fifi" "tostador"))
+(get-usuario (crear-usuario 19 10 2021 "Angel" "contraseña"))
+(get-usuario (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+(get-usuario (crear-usuario 21 12 2021 "Fifi" "tostador"))
+(get-contraseña (crear-usuario 19 10 2021 "Angel" "contraseña"))
+(get-contraseña (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+(get-contraseña (crear-usuario 21 12 2021 "Fifi" "tostador"))
+
+;EJEMPLOS MODIFICADORES:
+Creadas pero no aplicadas (no son necesarias hasta el momento)
+
+;EJEMPLOS OTRAS FUNCIONES:
+(modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 19 10 2021 "Angel" "contraseña"))
+(modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+(modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 21 12 2021 "Benjamin" "aloy"))
+(set-lista-usuarios (get-dato (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 4) (crear-usuario 19 10 2021 "Angel" "contraseña"))
+(set-lista-usuarios (get-dato (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 4) (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+(set-lista-usuarios (get-dato (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 4) (crear-usuario 21 12 2021 "Benjamin" "aloy"))
+(usuario-repetido? (get-dato (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 4) "Angel")
+(usuario-repetido? (get-dato (modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 19 10 2021 "Angel" "contraseña")) 4) "Angel")
+(usuario-repetido? (get-dato (modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 19 10 2021 "Angel" "contraseña")) 4) "Cale")
 
 
 
+
+
+
+
+
+
+
+
+
+
+> (define paradigma (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn"))
+> (define user1 (crear-usuario 19 10 2021 "Angel" "contraseña"))
+> (define user2 (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+> (define paradigma2 (modificar-lista-usuarios paradigma user1))
+> paradigma2
+'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña")) ())
+> (define paradigma3 (modificar-lista-usuarios paradigma2 user2))
+> paradigma3
+'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña") ((20 10 2021) "Jaime" "pinturaceresita")) ())
+> (usuario-repetido? (get-dato paradigma3 4) "Angel")
+|#
+
+(provide (all-defined-out))

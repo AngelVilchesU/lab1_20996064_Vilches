@@ -129,17 +129,17 @@
 
 #|
 ------------------------------------------------------------------------------------------------------
-EJEMPLOS CONSTRUCTOR:
+;EJEMPLOS CONSTRUCTOR:
 (crear-fecha 18 10 2021)
 (crear-fecha 22 11 2021)
 (crear-fecha 0 13 2020) ;Este ejemplo expresa una situación no valida ya que no existe un día enumerado como 0, un mes 13 ni nos encontramos en el año 2020
 
-EJEMPLOS PERTENENCIA:
+;EJEMPLOS PERTENENCIA:
 (fecha? (list 18 10 2021))
 (fecha? (list 22 11 2021))
 (fecha? (list 18 10 2021 0)) ;Este ejemplo expresa una situación no valida ya que no se respeta el formato fecha DD MM AA como lista de enteros
 
-EJEMPLOS SELECTORES:
+;EJEMPLOS SELECTORES:
 (get-dia (list 18 10 2021))
 (get-dia (list 22 11 2021))
 (get-dia (list 24 12 2021))
@@ -149,7 +149,7 @@ EJEMPLOS SELECTORES:
 (get-año (list 18 10 2022))
 (get-año (list 18 10 2023))
 
-EJEMPLOS MODIFICADORES:
+;EJEMPLOS MODIFICADORES:
 (set-dia (list 18 10 2021) 20)
 (set-dia (list 18 10 2021) 30)
 (set-dia (list 18 10 2021) 0) ;Este ejemplo expresa una situación no valida ya que no existe este día (tambien aplica al limite de dias de determinado mes sea bisiesto o no)
@@ -159,6 +159,14 @@ EJEMPLOS MODIFICADORES:
 (set-año (list 18 10 2021) 2022)
 (set-año (list 18 10 2021) 2024)
 (set-año (list 18 10 2021) 2020) ;Este ejemplo expresa una situación no valida ya que el año ya no aplica (actualizable)
+
+;EJEMPLOS OTRAS FUNCIONES:
+(bisiesto? 2021)
+(bisiesto? 2024)
+(bisiesto? 2030)
+(dias-del-mes 2 2021)
+(dias-del-mes 2 2024)
+(dias-del-mes 12 2030)
 ------------------------------------------------------------------------------------------------------
 |#
 
