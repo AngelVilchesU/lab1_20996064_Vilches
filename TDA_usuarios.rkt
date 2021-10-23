@@ -6,19 +6,19 @@
 ; Implementación del TDA usuarios
 
 ; Representación:
-; (integer X integer X integer) (strings) (strings) (integers)
-; (list dias meses años) (list usuarios) (list contraseñas) (list activo-inactivo)
+; (integer X integer X integer) (strings) (strings)
+; (list dias meses años) (list usuarios) (list contraseñas)
 
 ; Constructor:
 ; Descripción: Permite la creación de un usuario nuevo mediante la solicitud de los datos...
-;              ...fecha, usuario y contraseña
+;              ...fecha, usuario, contraseña y sesión activa o inactiva (booleano)
 ; Dominio: (integer X integer X integer X string X string)
 ; Recorrido: Lista con los datos
 
 (define crear-usuario
   (lambda (dia mes año usuario contraseña)
     (if (fecha? (crear-fecha dia mes año))
-        (list (crear-fecha dia mes año) usuario contraseña)
+        (list (crear-fecha dia mes año) usuario contraseña 0)
         '())))
 
 ; Pertenencia:
@@ -59,6 +59,14 @@
 (define get-contraseña
   (lambda (lista-info-usuario)
     (car (cdr (cdr lista-info-usuario)))))
+
+; Descripción: Función que permite obtener el valor booleano indicador de sesión activa o inactiva
+; Dominio: Lista de información del usuario
+; Recorrido: Booleano
+
+(define get-act-inc-sesión
+  (lambda (lista-info-usuario)
+    (car (cdr (cdr (cdr lista-info-usuario))))))
 
 ; Modificador:
 ; Descripción: Función que permite modificar el usuario registrado mediante...
@@ -107,7 +115,8 @@
 
 ; Descripción: Función que permite realizar una veríficación de la existencia (o no) de un usuario determinado mediante recursión natural/linea
 ; Dominio: Lista X usuario
-; Recorrido: 
+; Recorrido: Booleano
+; Tipo de recursión: Recursión natural/lineal
 
 (define usuario-repetido?
   (lambda (lista-info-usuarios usuario)
@@ -116,6 +125,46 @@
             (if (null? (cdr lista-info-usuarios)) #f
                 (usuario-repetido? (cdr lista-info-usuarios) usuario))
             ))))
+
+; Descripción: Función que permite modificar el valor booleano asignado de acuerdo con las operaciones...
+;              ...que se realicen (activar)
+; Dominio: Lista de información del usuario
+; Recorrido: Lista correspondiente a la información del usuario modificada (sesión activa)
+
+(define set-sesion-act
+  (lambda (lista-info-usuario usuario paradigmadocs)
+    (if (null? lista-info-usuario) #f
+        (if (equal? usuario (get-usuario (car lista-info-usuario)))
+            (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1))
+            (if (null? (cdr lista-info-usuario)) #f
+                (usuario-repetido? (cdr lista-info-usuario) usuario))
+            ))
+    
+    ))
+
+; Descripción: Función que permite modificar el valor booleano asignado de acuerdo con las operaciones...
+;              ...que se realicen (desactivar)
+; Dominio: Lista de información del usuario
+; Recorrido: Lista correspondiente a la información del usuario modificada (sesión inactiva)
+
+(define set-sesion-ina
+  (lambda (lista-info-usuario)
+    (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) (get-contraseña lista-info-usuario) 0)
+    ))
+
+; Descripción: Función que permite realizar una veríficación de la existencia (o no) de una contraseña determinada mediante recursión natural/linea
+; Dominio: Lista X contraseña
+; Recorrido: Booleano
+; Tipo de recursión: Recursión natural/lineal
+
+(define contraseña-repetida?
+  (lambda (lista-info-usuarios contraseña)
+    (if (null? lista-info-usuarios) #f
+        (if (equal? contraseña (get-contraseña (car lista-info-usuarios))) #t
+            (if (null? (cdr lista-info-usuarios)) #f
+                (contraseña-repetida? (cdr lista-info-usuarios) contraseña))
+            ))))
+
 
 
 #|
@@ -140,6 +189,7 @@
 (get-contraseña (crear-usuario 19 10 2021 "Angel" "contraseña"))
 (get-contraseña (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
 (get-contraseña (crear-usuario 21 12 2021 "Fifi" "tostador"))
+(get-act-inc-sesión (crear-usuario 19 10 2021 "Angel" "contraseña"))
 
 ;EJEMPLOS MODIFICADORES:
 Creadas pero no aplicadas (no son necesarias hasta el momento)
@@ -154,8 +204,8 @@ Creadas pero no aplicadas (no son necesarias hasta el momento)
 (usuario-repetido? (get-dato (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 4) "Angel")
 (usuario-repetido? (get-dato (modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 19 10 2021 "Angel" "contraseña")) 4) "Angel")
 (usuario-repetido? (get-dato (modificar-lista-usuarios (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") (crear-usuario 19 10 2021 "Angel" "contraseña")) 4) "Cale")
-
-
+(set-sesion-act (crear-usuario 19 10 2021 "Angel" "contraseña"))
+(set-sesion-ina (crear-usuario 19 10 2021 "Angel" "contraseña"))
 
 
 
