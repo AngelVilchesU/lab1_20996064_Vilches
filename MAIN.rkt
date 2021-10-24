@@ -29,35 +29,38 @@
 (define login
   (lambda (paradigmadocs usuario contraseña operación)
     (if (and (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #t ) (equal? (contraseña-repetida? (get-dato paradigmadocs 4) contraseña) #t ))
-        (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs)
-        
-        
-        #f)
-
-    ))
-
-
-
-    #|
         (if (procedure? operación)
+            (if (equal? operación create)
+                "create (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                (if (equal? operación share)
+                    "share (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                    (if (equal? operación add)
+                        "add (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                        (if (equal? operación restoreVersion)
+                            "restoreVersion (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                            (if (equal? operación revokeAllAccesses)
+                                "revokeAllAccesses (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                                (if (equal? operación search)
+                                    "search (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                                    (if (equal? operación paradigmadocs->string)
+                                        "paradigmadocs->string (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                                        #f)))))))#f)#f)))
 
-            (if (equal? ))
 
-
-
-
-
-
-
-
-
-
-            
-            #f)
-
-       ))
-|#
-
+(define create
+  "a")
+(define share
+  "a")
+(define add
+  "a")
+(define restoreVersion
+  "a")
+(define revokeAllAccesses
+  "a")
+(define search
+  "a")
+(define paradigmadocs->string
+  "a")
 
 
 
@@ -73,16 +76,13 @@ EJEMPLOS register:
 (register (register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") 19 11 2021 "Angel" "cerealTrix") ; Este ejemplo expresa una situación no valida pues el nombre de usuario ya existe
 
 
-
-
 > (define paradigmadocs (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn"))
-> (define usuario1 (crear-usuario 19 10 2021 "Angel" "contraseña"))
-> (define paradigmadocs2 (modificar-lista-usuarios paradigmadocs usuario1))
-> paradigmadocs2
-'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña" 0)) ())
-> (login paradigmadocs2 "Angel" "contraseña" "a")
-(get-dato paradigmadocs2 4)
+> (define paradigmadocs2 (register paradigmadocs 19 10 2021 "Angel" "contraseña"))
+> (define paradigmadocs3 (register paradigmadocs2 20 10 2021 "Jaime" "pinturaceresita"))
+> (define paradigmadocs4 (login paradigmadocs3 "Jaime" "pinturaceresita" "a"))
 
+> (define paradigmadocs5 (removea (get-dato paradigmadocs4 4) "Jaime" paradigmadocs4))
+removea
 
 
 |#

@@ -137,7 +137,7 @@
         (if (equal? usuario (get-usuario (car lista-info-usuario)))
             (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1))
             (if (null? (cdr lista-info-usuario)) #f
-                (usuario-repetido? (cdr lista-info-usuario) usuario))
+                (set-sesion-act (cdr lista-info-usuario) usuario paradigmadocs))
             ))
     
     ))
@@ -165,7 +165,26 @@
                 (contraseña-repetida? (cdr lista-info-usuarios) contraseña))
             ))))
 
+(define borrar-lista-usuario-inactivo
+  (lambda (paradigmadocs lista usuario)
+    (if (null? lista)
+         lista
+        (if (and (equal? usuario (get-usuario (car lista))) (equal? 0 (get-act-inc-sesión (car lista)))) 
+            (list (get-dato paradigmadocs 0) (get-dato paradigmadocs 1) (get-dato paradigmadocs 2) (get-dato paradigmadocs 3) (set-lista-usuarios '() (cdr lista)) (get-dato paradigmadocs 5))  
+            (cons (car lista) (borrar-lista-usuario-inactivo paradigmadocs (cdr lista) usuario))))))
 
+(define removea
+  (lambda (lista usuario paradigmadocs)
+    (if (null? lista)
+         lista
+        (if (and (equal? usuario (get-usuario (car lista))) (equal? 0 (get-act-inc-sesión (car lista)))) 
+            (list (get-dato paradigmadocs 0) (get-dato paradigmadocs 1) (get-dato paradigmadocs 2) (get-dato paradigmadocs 3) (remove (car lista) (get-dato paradigmadocs 4)) (get-dato paradigmadocs 5))   
+            (removea (cdr lista) usuario paradigmadocs)))))
+
+(define agregar-y-remover
+  (lambda (lista usuario paradigmadocs)
+    
+    (removea (get-dato (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs) 4) usuario (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs))))
 
 #|
 
