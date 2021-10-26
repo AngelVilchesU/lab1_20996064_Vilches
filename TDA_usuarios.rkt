@@ -16,10 +16,13 @@
 ; Recorrido: Lista con los datos (Importante: Id es ingresado automáticamente)
 
 (define crear-usuario
-  (lambda (dia mes año usuario contraseña Id)
+  (lambda (dia mes año usuario contraseña)
     (if (fecha? (crear-fecha dia mes año))
-        (list (crear-fecha dia mes año) usuario contraseña 0 Id)
-        '())))
+        (list (crear-fecha dia mes año) usuario contraseña 0)
+        '()
+        )
+    )
+  )
 
 ; Pertenencia:
 ; Descripción: Función que permite verificar si un usuario (información) se encuentra bien definido
@@ -34,7 +37,9 @@
                 #t
                 #f)
             #f)
-        #f)))
+        #f)
+    )
+  )
 
 ; Selector:
 ; Descripción: Función que permite obtener la fecha registrada
@@ -43,7 +48,9 @@
 
 (define get-fecha
   (lambda (lista-info-usuario)
-    (car lista-info-usuario)))
+    (car lista-info-usuario)
+    )
+  )
 
 ; Descripción: Función que permite obtener el usuario registrado
 ; Dominio: Lista de información del usuario
@@ -51,7 +58,9 @@
 
 (define get-usuario
   (lambda (lista-info-usuario)
-    (car (cdr lista-info-usuario))))
+    (car (cdr lista-info-usuario))
+    )
+  )
 
 ; Descripción: Función que permite obtener la contraseña registrada
 ; Dominio: Lista de información del usuario
@@ -59,7 +68,9 @@
 
 (define get-contraseña
   (lambda (lista-info-usuario)
-    (car (cdr (cdr lista-info-usuario)))))
+    (car (cdr (cdr lista-info-usuario)))
+    )
+  )
 
 ; Descripción: Función que permite obtener el valor booleano indicador de sesión activa o inactiva
 ; Dominio: Lista de información del usuario
@@ -67,12 +78,9 @@
 
 (define get-act-inc-sesión
   (lambda (lista-info-usuario)
-    (car (cdr (cdr (cdr lista-info-usuario))))))
-
-
-(define get-Id
-  (lambda (lista-info-usuario)
-    (car (cdr (cdr (cdr (cdr lista-info-usuario)))))))
+    (car (cdr (cdr (cdr lista-info-usuario))))
+    )
+  )
 
 ; Modificador:
 ; Descripción: Función que permite modificar el usuario registrado mediante...
@@ -84,7 +92,9 @@
   (lambda (lista-info-usuario nuevo-usuario)
     (if (usuario? (list (get-fecha lista-info-usuario) nuevo-usuario (get-contraseña lista-info-usuario)))
         (list (get-fecha lista-info-usuario) nuevo-usuario (get-contraseña lista-info-usuario))
-        #f)))
+        #f)
+    )
+  )
 
 ; Descripción: Función que permite modificar la contraseña registrada mediante...
 ;              ...la creación de una nueva lista conservando los datos que no sean la contraseña
@@ -95,9 +105,10 @@
   (lambda (lista-info-usuario nueva-contraseña)
     (if (usuario? (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) nueva-contraseña))
         (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) nueva-contraseña)
-        #f)))
+        #f)
+    )
+  )
 
-; Otras funciones:
 ; Descripción: Función que permite modificar la lista de usuarios creada en la plataforma diseñada (posición Nro. 4) recibiendo como...
 ;              ... parametros de entrada la plataforma y la lista contenedora de la información de un nuevo usuario para, en paralelo...
 ;              ... con la función denominada "set-lista-usuarios" insertarla dentro como lista obteniendo a nivel de plataforma en...
@@ -107,19 +118,22 @@
 
 (define modificar-lista-usuarios
   (lambda (plataforma lista-info-usuarios)
-    (list (get-dato plataforma 0) (get-dato plataforma 1) (get-dato plataforma 2) (get-dato plataforma 3) (set-lista-usuarios (get-dato plataforma 4) lista-info-usuarios) (get-dato plataforma 5)
-    )))
+    (list (get-dato plataforma 0) (get-dato plataforma 1) (get-dato plataforma 2) (get-dato plataforma 3) (set-lista-usuarios (get-dato plataforma 4) lista-info-usuarios) (get-dato plataforma 5))
+    )
+  )
 
-; Descripción: Función que permite unir dos listas mediante la función "append", se aplica de forma complementaria a la función anterior
+; Otras funciones:
+; Descripción: Función que permite unir dos listas mediante la función "append"
 ; Dominio: list X nueva-lista
 ; Recorrido: Unión de listas como listas de listas
 
 (define set-lista-usuarios
   (lambda (lista nueva-lista)
     (append lista (list nueva-lista))
-  ))
+    )
+  )
 
-; Descripción: Función que permite realizar una veríficación de la existencia (o no) de un usuario determinado mediante recursión natural/linea
+; Descripción: Función que permite realizar una veríficación de la existencia (o no) de un usuario determinado mediante recursión natural/lineal
 ; Dominio: Lista X usuario
 ; Recorrido: Booleano
 ; Tipo de recursión: Recursión natural/lineal
@@ -130,7 +144,10 @@
         (if (equal? usuario (get-usuario (car lista-info-usuarios))) #t
             (if (null? (cdr lista-info-usuarios)) #f
                 (usuario-repetido? (cdr lista-info-usuarios) usuario))
-            ))))
+            )
+        )
+    )
+  )
 
 ; Descripción: Función que permite modificar el valor booleano asignado de acuerdo con las operaciones...
 ;              ...que se realicen (activar)
@@ -141,13 +158,16 @@
   (lambda (lista-info-usuario usuario paradigmadocs)
     (if (null? lista-info-usuario) #f
         (if (equal? usuario (get-usuario (car lista-info-usuario)))
-            (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1 (get-Id (car lista-info-usuario))))
+            (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1))
             (if (null? (cdr lista-info-usuario)) #f
-                (set-sesion-act (cdr lista-info-usuario) usuario paradigmadocs))
-            ))
-    
-    ))
+                (set-sesion-act (cdr lista-info-usuario) usuario paradigmadocs)
+                )
+            )
+        )
+    )
+  )
 
+; ACTUALIZAR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ; Descripción: Función que permite modificar el valor booleano asignado de acuerdo con las operaciones...
 ;              ...que se realicen (desactivar)
 ; Dominio: Lista de información del usuario
@@ -169,36 +189,60 @@
         (if (equal? contraseña (get-contraseña (car lista-info-usuarios))) #t
             (if (null? (cdr lista-info-usuarios)) #f
                 (contraseña-repetida? (cdr lista-info-usuarios) contraseña))
-            ))))
+            )
+        )
+    )
+  )
 
-(define borrar-lista-usuario-inactivo
-  (lambda (paradigmadocs lista usuario)
-    (if (null? lista)
-         lista
-        (if (and (equal? usuario (get-usuario (car lista))) (equal? 0 (get-act-inc-sesión (car lista)))) 
-            (list (get-dato paradigmadocs 0) (get-dato paradigmadocs 1) (get-dato paradigmadocs 2) (get-dato paradigmadocs 3) (set-lista-usuarios '() (cdr lista)) (get-dato paradigmadocs 5))  
-            (cons (car lista) (borrar-lista-usuario-inactivo paradigmadocs (cdr lista) usuario))))))
+; Descripción: Función orientada a la autentificación del usuario (activo/inactivo), permite la eliminación de una lista con un usuario especifíco inactivo luego de,...
+;              ... mediante una función complementaria, haber insertado dicha lista (mediante selectores y modificadores) como usuario activo (en caso de serlo)
+; Dominio: Listabase X usuario X paradigmadocs
+; Recorrido: Actualización de paradigmadocs
+; Tipo de recursión: Recursión natural/lineal
 
-(define removea
+(define remover-list-usuario-inactivo
   (lambda (lista usuario paradigmadocs)
     (if (null? lista)
          lista
         (if (and (equal? usuario (get-usuario (car lista))) (equal? 0 (get-act-inc-sesión (car lista)))) 
             (list (get-dato paradigmadocs 0) (get-dato paradigmadocs 1) (get-dato paradigmadocs 2) (get-dato paradigmadocs 3) (remove (car lista) (get-dato paradigmadocs 4)) (get-dato paradigmadocs 5))   
-            (removea (cdr lista) usuario paradigmadocs)))))
+            (remover-list-usuario-inactivo (cdr lista) usuario paradigmadocs)
+            )
+        )
+    )
+  )
+
+; Descripción: Función que aplica dos función definidas previamente de forma conjunta para la creación/copia (mediante getters) e inserción (mediante setters)
+;              ... de los datos (lista) de un usuario variando el parametro inactivo a activo eliminando la primera lista y retornando las listas que existian
+;              ... previamente a la operación
+; Dominio: Listabase X usuario X paradigmadocs
+; Recorrido: Actualización de paradigmadocs
 
 (define agregar-y-remover
   (lambda (lista usuario paradigmadocs)
+    (remover-list-usuario-inactivo (get-dato (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs) 4) usuario (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs))
+    )
+  )
+
+; Descripción: Función que busca mediante recursión natural/lineal un usuario cuyo parámetro indicador de autentificador en su correspondiente lista de información...
+;              ... refleje que este se encuentre activo (1)
+; Dominio: Lista base de usuarios
+; Recorrido: Usuario (caso verdadero, es decir, exista y esté activo) o el valor Booleano indicador de falso (caso contrario, es decir, no existe i no está activo)
+; Tipo de recursión: Recursión natural/lineal
+
+(define buscar-usuario-activo
+  (lambda (lista-base)
+    (if (equal? 1 (get-act-inc-sesión (car lista-base)))
+        (get-usuario (car lista-base))
+        (if (null? (cdr lista-base))
+            #f
+            (buscar-usuario-activo (cdr lista-base))
+            )
+        )
+    )
+  )
+
     
-    (removea (get-dato (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs) 4) usuario (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs))))
-
-(define fijar-ID-usuario
-  (lambda (lista-info-usuario Id-acc)
-    (if (null? lista-info-usuario)
-        (+ 2 Id-acc)
-        (fijar-ID-usuario (cdr lista-info-usuario) (+ 1 Id-acc)))
-    ))
-
 
 #|
 
@@ -260,6 +304,32 @@ Creadas pero no aplicadas (no son necesarias hasta el momento)
 > paradigma3
 '("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña") ((20 10 2021) "Jaime" "pinturaceresita")) ())
 > (usuario-repetido? (get-dato paradigma3 4) "Angel")
+
+buscar-usuario-activo (get-dato paradigma3 4)
+
+
+
+
+
+
+
+
+-----------------> (define paradigma (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn"))
+> (define user1 (crear-usuario 19 10 2021 "Angel" "contraseña"))
+> (define user2 (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+> (define paradigma2 (modificar-lista-usuarios paradigma user1))
+> paradigma2
+'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña" 0)) ())
+> (define paradigma3 (modificar-lista-usuarios paradigma2 user2))
+> paradigma3
+'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña" 0) ((20 10 2021) "Jaime" "pinturaceresita" 0)) ())
+
+> paradigma4
+#f
+> paradigma3
+'("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña" 0) ((20 10 2021) "Jaime" "pinturaceresita" 0)) ())
+> (define paradigma5 (agregar-y-remover (get-dato paradigma3 4) "Jaime" paradigma3))
+> (define paradigma4 (buscar-usuario-activo (get-dato paradigma3 4)))
 |#
 
 (provide (all-defined-out))

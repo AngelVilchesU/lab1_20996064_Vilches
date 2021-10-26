@@ -17,9 +17,9 @@
 ;             ... y estas listas aludidas serán operadas según se ejecute determinada función u operación. Adicionalmente, "FN-ID-documento" es ingresado automáticamente
 
 (define crear-documento
-  (lambda (dia mes año nombre-documento usuario ID-documento)
+  (lambda (dia mes año nombre-documento usuario ID-documento contenido versión-documento)
     (if (fecha? (crear-fecha dia mes año))
-        (list ID-documento usuario (crear-fecha dia mes año) nombre-documento '() '() )
+        (list ID-documento usuario (crear-fecha dia mes año) nombre-documento (list (list versión-documento (crear-fecha dia mes año) contenido )) '() )
         '()
         )
     )
@@ -55,19 +55,33 @@
 ;            ... se obtiene lo que puede considerarse como el resto de la lista restando un digito al n ingresado para "calibrar"...
 ;            ... la busqueda. El proceso se repite hasta conseguír dicho elemento.
 
-(define get-lista
+(define get-dato-doc
   (lambda (lista-documentos n)
     (if (= n 0)
         (car lista-documentos)
-        (get-lista (cdr lista-documentos) (- n 1))
+        (get-dato-doc (cdr lista-documentos) (- n 1))
         )
     )
   )
+
+; Modificador:
+; Descripción: Función que permite insertar una lista mediante la obtención de una lista de listas (existen dos)
+; Dominio: Lista base y lista a agregar
+; Recorrido: Lista con datos actualizados
+
+(define set-lista
+  (lambda (lista-base lista-agregar)
+    (append lista-base (list lista-agregar)
+            )
+    )
+  )
+
 
 ; Otras funciones:
 ; Descripción: Función que permite insertar una ID del documento considerando el número de documentos distintos
 ; Dominio: Lista de listas
 ; Recorrido: integer
+; Tipo de recursión: Recursión de cola (sin estados pendientes)
 
 (define ID-documento
   (lambda (lista-documentos ID-acc)
@@ -78,10 +92,21 @@
     )
   )
 
-#|
+; Descripción: Función que permite insertar una versión del documento de acuerdo con el número de listas existentes (representado las versiones)...
+;              ... según la representación realizada
+; Dominio: Lista de versiones y un acumulador (inicialmente siempre cero)
+; Recorrido: integer
+; Tipo de recursión: Recursión de cola (sin estados pendientes)
+
 (define versión-documento
-  (lambda ))
-|#
+  (lambda (lista-base V-acc)
+    (if (null? lista-base)
+        (add1 V-acc)
+        (versión-documento (cdr lista-base) (add1 V-acc))
+        )
+    )
+  )
+
 #|
 
 ;EJEMPLOS CONSTRUCTOR:
@@ -96,3 +121,5 @@
 
 
 |#
+
+(provide (all-defined-out))

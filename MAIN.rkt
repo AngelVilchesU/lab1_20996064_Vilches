@@ -3,6 +3,7 @@
 (require "TDA_paradigmadocs.rkt")
 (require "TDA_fecha.rkt")
 (require "TDA_usuarios.rkt")
+(require "TDA_documentos.rkt")
 
 ; Implementación de los requisitos funcionales
 
@@ -18,7 +19,7 @@
 (define register
   (lambda (paradigmadocs dia mes año usuario contraseña)
     (if (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #f)   
-        (modificar-lista-usuarios paradigmadocs (crear-usuario dia mes año usuario contraseña (fijar-ID-usuario (get-dato paradigmadocs 4)  0)) )
+        (modificar-lista-usuarios paradigmadocs (crear-usuario dia mes año usuario contraseña) )
         paradigmadocs)))
        
 ; Descripción: Función que permite autenticar un usuario y de ello la ejecución de comandos definido en la plataforma...
@@ -56,11 +57,28 @@
     )
   )
 
-
-
-
 (define create
-  "a")
+  (lambda (paradigmadocs dia mes año nombre-documento contenido)
+    (list (get-dato paradigmadocs 0)
+          (get-dato paradigmadocs 1)
+          (get-dato paradigmadocs 2)
+          (get-dato paradigmadocs 3)
+          (get-dato paradigmadocs 4)
+          (set-lista (get-dato paradigmadocs 5)
+                     (crear-documento
+                      dia mes año nombre-documento (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-documento (get-dato paradigmadocs 5) 0) contenido 0)
+                                              ))))
+
+
+
+
+
+
+
+
+
+
+
 (define share
   "a")
 (define add
@@ -92,10 +110,11 @@ EJEMPLOS register:
 > (define paradigmadocs2 (register paradigmadocs 19 10 2021 "Angel" "contraseña"))
 > (define paradigmadocs3 (register paradigmadocs2 20 10 2021 "Jaime" "pinturaceresita"))
 > (define paradigmadocs4 (login paradigmadocs3 "Jaime" "pinturaceresita" "a"))
+> (define paradigmadocs5 (agregar-y-remover (get-dato paradigmadocs3 4) "Jaime" paradigmadocs3))
+> (define paradigmadocs6 (create paradigmadocs5 26 10 2021 "Doc" "AAAA"))
 > 
 
-> (define paradigmadocs5 (removea (get-dato paradigmadocs4 4) "Jaime" paradigmadocs4))
-removea
-
-
+---
+> (define a '("gDocs" (16 10 2021) "encryptFn" "encryptFn" (((19 10 2021) "Angel" "contraseña" 0) ((20 10 2021) "Jaime" "pinturaceresita" 1)) ()))
+> (get-dato-doc (get-dato a 5) 5)
 |#
