@@ -5,17 +5,14 @@
 ; Implementación del TDA paradigmadocs
 
 ; Representación:
-; (string X date X EncryptFunction X DecryptFunction X (string X string X date) X (string X integer))
-; (list nombre-plataforma dia mes año EncryptFunction DecryptFunction (usuario/s contraseña/s dia mes año) (usuario activo/inactivo)
+; (string X date X EncryptFunction X DecryptFunction X (<<<TDA-usuarios>>>) X (<<<TDA-documentos>>>))
+; (list nombre-plataforma dia mes año EncryptFunction DecryptFunction ((dia mes año) usuario/s contraseña/s activo-inactivo ID) () ) ;°°°°°°°°°°ACTUALIZAR
 
 ; Contructor:
 ; Descripción: Permite crear la plataforma que contendrá datos referentes a distintos TDA a implementar. Algunos de estos son...
 ;              ... usuarios y su información, sesión activa, documentos, entre otras. 
 ; Dominio: (string X integer X integer X integer X EncryptFunction X DecryptFunction)
-; Recorrido: (string X integer X integer X integer X EncryptFunction X DecryptFunction X (string X string X integer X integer X integer)...
-;             ... X (string X integer))
-; Adicional: Lo citado: "(string X string X integer X integer X integer)", corresponde a listas inicialmente nulas que contemplarán los usuarios,...
-;            ... contraseñas y fechas de creación. Del mismo modo, "(string X integer)" corresponde al usuario y si se encuentra activo o no.
+; Recorrido: (string X integer X integer X integer X EncryptFunction X DecryptFunction X '() '() )
 
 (define paradigmadocs
   (lambda (nombre dia mes año EncryptFunction DecryptFunction)
@@ -35,8 +32,7 @@
                 #t
                 #f)
             #f)
-        #f
-        )))
+        #f)))
 
 ; Selectores:
 ; Descripición: Capa que permite la obtención de determinado elemento en paradigmadocs
@@ -45,17 +41,14 @@
 ; Recursión: Recursión de cola cuyo caso base contempla la entrega del primer elemento de la lista ingresada en caso de que el valor...
 ;            ... correspondiente a la posición buscada sea cero, caso contrario, se llama a la función empleando "cdr" de modo que...
 ;            ... se obtiene lo que puede considerarse como el resto de la lista restando un digito al n ingresado para "calibrar"...
-;            ... la busqueda. El proceso se repite hasta conseguír dicho elemento, no sin antes evalúar mediante un condicional si...
-;            ... n es menor al largo de la lista ingresado, en cuyo caso no es posible conseguír un elemento (#f).
+;            ... la busqueda. El proceso se repite hasta conseguír dicho elemento.
 
 (define get-dato
   (lambda (paradigmadocs n)
-  
     (if (= n 0)
         (car paradigmadocs)
-        (get-dato (cdr paradigmadocs) (- n 1)))
-        
-    ))
+        (get-dato (cdr paradigmadocs) (- n 1))
+        )))
 
 ; Modificador 
 ; Descripción: Permite la inserción de un elemento/lista en el final de la plataforma paradigmadocs

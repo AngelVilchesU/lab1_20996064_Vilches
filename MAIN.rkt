@@ -17,9 +17,9 @@
 
 (define register
   (lambda (paradigmadocs dia mes año usuario contraseña)
-    (if (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #f)    
-       (modificar-lista-usuarios paradigmadocs (crear-usuario dia mes año usuario contraseña))
-       paradigmadocs)))
+    (if (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #f)   
+        (modificar-lista-usuarios paradigmadocs (crear-usuario dia mes año usuario contraseña (fijar-ID-usuario (get-dato paradigmadocs 4)  0)) )
+        paradigmadocs)))
        
 ; Descripción: Función que permite autenticar un usuario y de ello la ejecución de comandos definido en la plataforma...
 ;              ... dependiendo de la correcta validación del usuario
@@ -31,7 +31,7 @@
     (if (and (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #t ) (equal? (contraseña-repetida? (get-dato paradigmadocs 4) contraseña) #t ))
         (if (procedure? operación)
             (if (equal? operación create)
-                "create (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                "create (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)|||||||||||||||||||||||||||||||||||||
                 (if (equal? operación share)
                     "share (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
                     (if (equal? operación add)
@@ -44,7 +44,19 @@
                                     "search (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
                                     (if (equal? operación paradigmadocs->string)
                                         "paradigmadocs->string (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
-                                        #f)))))))#f)#f)))
+                                        #f)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            #f)
+        #f)
+    )
+  )
+
+
 
 
 (define create
@@ -80,6 +92,7 @@ EJEMPLOS register:
 > (define paradigmadocs2 (register paradigmadocs 19 10 2021 "Angel" "contraseña"))
 > (define paradigmadocs3 (register paradigmadocs2 20 10 2021 "Jaime" "pinturaceresita"))
 > (define paradigmadocs4 (login paradigmadocs3 "Jaime" "pinturaceresita" "a"))
+> 
 
 > (define paradigmadocs5 (removea (get-dato paradigmadocs4 4) "Jaime" paradigmadocs4))
 removea

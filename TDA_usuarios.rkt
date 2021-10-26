@@ -6,23 +6,23 @@
 ; Implementación del TDA usuarios
 
 ; Representación:
-; (integer X integer X integer) (strings) (strings)
-; (list dias meses años) (list usuarios) (list contraseñas)
+; (integer X integer X integer X string X string X integer X integer)
+; ( (dia mes año) usuario contraseña activo-inactivo ID)
 
 ; Constructor:
 ; Descripción: Permite la creación de un usuario nuevo mediante la solicitud de los datos...
 ;              ...fecha, usuario, contraseña y sesión activa o inactiva (booleano)
 ; Dominio: (integer X integer X integer X string X string)
-; Recorrido: Lista con los datos
+; Recorrido: Lista con los datos (Importante: Id es ingresado automáticamente)
 
 (define crear-usuario
-  (lambda (dia mes año usuario contraseña)
+  (lambda (dia mes año usuario contraseña Id)
     (if (fecha? (crear-fecha dia mes año))
-        (list (crear-fecha dia mes año) usuario contraseña 0)
+        (list (crear-fecha dia mes año) usuario contraseña 0 Id)
         '())))
 
 ; Pertenencia:
-; Descripción: Función que permite verificar si una usuario (información) se encuentra bien definido
+; Descripción: Función que permite verificar si un usuario (información) se encuentra bien definido
 ; Dominio: Lista correspondiente a la información de un usuario
 ; Recorrido: Booleando verificador
 
@@ -33,7 +33,8 @@
             (if (string? (car (cdr (cdr list-info-usuario))))
                 #t
                 #f)
-        #f)#f)))
+            #f)
+        #f)))
 
 ; Selector:
 ; Descripción: Función que permite obtener la fecha registrada
@@ -67,6 +68,11 @@
 (define get-act-inc-sesión
   (lambda (lista-info-usuario)
     (car (cdr (cdr (cdr lista-info-usuario))))))
+
+
+(define get-Id
+  (lambda (lista-info-usuario)
+    (car (cdr (cdr (cdr (cdr lista-info-usuario)))))))
 
 ; Modificador:
 ; Descripción: Función que permite modificar el usuario registrado mediante...
@@ -135,7 +141,7 @@
   (lambda (lista-info-usuario usuario paradigmadocs)
     (if (null? lista-info-usuario) #f
         (if (equal? usuario (get-usuario (car lista-info-usuario)))
-            (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1))
+            (modificar-lista-usuarios paradigmadocs (list (get-fecha (car lista-info-usuario)) (get-usuario (car lista-info-usuario)) (get-contraseña (car lista-info-usuario)) 1 (get-Id (car lista-info-usuario))))
             (if (null? (cdr lista-info-usuario)) #f
                 (set-sesion-act (cdr lista-info-usuario) usuario paradigmadocs))
             ))
@@ -185,6 +191,14 @@
   (lambda (lista usuario paradigmadocs)
     
     (removea (get-dato (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs) 4) usuario (set-sesion-act (get-dato paradigmadocs 4) usuario paradigmadocs))))
+
+(define fijar-ID-usuario
+  (lambda (lista-info-usuario Id-acc)
+    (if (null? lista-info-usuario)
+        (+ 2 Id-acc)
+        (fijar-ID-usuario (cdr lista-info-usuario) (+ 1 Id-acc)))
+    ))
+
 
 #|
 
