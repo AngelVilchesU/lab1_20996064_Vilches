@@ -6,7 +6,7 @@
 
 ; Representación:
 ; (string X date X EncryptFunction X DecryptFunction X (<<<TDA-usuarios>>>) X (<<<TDA-documentos>>>))
-; (list nombre-plataforma dia mes año EncryptFunction DecryptFunction ((dia mes año) usuario/s contraseña/s activo-inactivo ID) () ) ;°°°°°°°°°°ACTUALIZAR
+; (list nombre-plataforma dia mes año EncryptFunction DecryptFunction '() '() )
 
 ; Contructor:
 ; Descripción: Permite crear la plataforma que contendrá datos referentes a distintos TDA a implementar. Algunos de estos son...
@@ -16,8 +16,11 @@
 
 (define paradigmadocs
   (lambda (nombre dia mes año EncryptFunction DecryptFunction)
-   (list nombre (crear-fecha dia mes año) EncryptFunction DecryptFunction '() '()
-  )))
+    (if (paradigmadocs? (list nombre (crear-fecha dia mes año) EncryptFunction DecryptFunction '() '() ))
+        (list nombre (crear-fecha dia mes año) EncryptFunction DecryptFunction '() '())
+        null)
+    )
+  )
 
 ; Pertenencia:
 ; Descripción: Función que permite verificar si una plataforma paradigmadocs se encuentra bien definida inicialmente
@@ -26,13 +29,19 @@
 
 (define paradigmadocs?
   (lambda (paradigmadocs)
-    (if (string? (car paradigmadocs))
-        (if (and (integer? (car (cdr paradigmadocs))) (integer? (car (cdr (cdr paradigmadocs)))) (integer? (car (cdr (cdr (cdr paradigmadocs))))))
-            (if (and (procedure? (car (cdr (cdr (cdr (cdr paradigmadocs)))))) (procedure? (car (cdr (cdr (cdr (cdr (cdr paradigmadocs)))))))) ;REVISAR CUANDO LA FUNCIÓN encrypt esté REALIZADA
-                #t
+    (if (list? paradigmadocs)
+        (if (= (length paradigmadocs) 6)
+            (if (string? (car paradigmadocs))
+                (if (fecha? (car (cdr paradigmadocs)))
+                    (if (and (procedure? (car (cdr (cdr paradigmadocs)))) (procedure? (car (cdr (cdr (cdr paradigmadocs))))))
+                        #t
+                        #f)
+                    #f)
                 #f)
             #f)
-        #f)))
+        #f)
+    )
+  )
 
 ; Selectores:
 ; Descripición: Capa que permite la obtención de determinado elemento en paradigmadocs
@@ -47,8 +56,9 @@
   (lambda (paradigmadocs n)
     (if (= n 0)
         (car paradigmadocs)
-        (get-dato (cdr paradigmadocs) (- n 1))
-        )))
+        (get-dato (cdr paradigmadocs) (- n 1))     )
+    )
+  )
 
 ; Modificador 
 ; Descripción: Permite la inserción de un elemento/lista en el final de la plataforma paradigmadocs
@@ -66,26 +76,37 @@
         (cons (car paradigmadocs) (set-elemento (cdr paradigmadocs) elemento))
         )))
 
+; Otras funciones:
+; Descripción
+; Dominio:
+; Recorrido:
+
+(define encryptFn (lambda (s) (list->string (reverse (string->list s)))))
 
 
 #|
+--------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
-(paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") ; Las funciones "encryptFn" deben ser llamadas sin comillas (procedimiento) una vez realizada la función enriptadora
-(paradigmadocs "gWord" 17 10 2021 "encryptFn" "encryptFn") ;
-(paradigmadocs "gTXT" 18 10 2021 "encryptFn" "encryptFn") ;
+(define emptyGDocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))
+(define emptyGDocs-2 (paradigmadocs "gWord" 17 10 2021 encryptFn encryptFn))
+(define emptyGDocs-3 (paradigmadocs "gTXT" 18 13 2021 encryptFn encryptFn))
+; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:
-PENDIENTE HASTA LA REALIZACIÓN DE LA FUNCIÓN ENCRIPTADORA, sin emabargo, es funcional
+(define ejemplo-paradigmadocs?-1 (paradigmadocs? emptyGDocs))
+(define ejemplo-paradigmadocs?-2 (paradigmadocs? emptyGDocs-2))
+(define ejemplo-paradigmadocs?-3 (paradigmadocs? emptyGDocs-3))
+; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS SELECTOR:
-(get-dato '("gDocs" (16 10 2021) "encryptFn" "encryptFn" () ()) 0)
-(get-dato '("gWord" (17 10 2021) "encryptFn" "encryptFn" () ()) 1)
-(get-dato '("gTXT" (18 10 2021) "encryptFn" "encryptFn" () ()) 5)
+(define ejemplo-get-dato-1 (get-dato emptyGDocs 0))
+(define ejemplo-get-dato-2 (get-dato emptyGDocs 1))
+(define ejemplo-get-dato-3 (get-dato emptyGDocs-2 5))
 
 ;EJEMPLOS MODIFICADOR:
-(set-elemento (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") "algún string o entero")
-(set-elemento (paradigmadocs "gWord" 17 10 2021 "encryptFn" "encryptFn") "alguna función (sin comillas)")
-(set-elemento (paradigmadocs "gTXT" 18 10 2021 "encryptFn" "encryptFn") (list))
+; Es importante comentar que el modificador de paradigmadocs no será utilizado pues no es necesario según la representación...
+; ... cambiar los elementos inicialmente definidos en la plataforma
+--------------------------------------------------------------------------------------------------------------------------------------------
 |#
 
 (provide (all-defined-out))  

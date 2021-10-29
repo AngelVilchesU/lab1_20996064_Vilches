@@ -1,6 +1,8 @@
 #lang racket
 
 (require "TDA_fecha.rkt")
+(require "TDA_paradigmadocs.rkt")
+(require "TDA_usuarios.rkt")
 
 ; Implementación del TDA documento
 
@@ -18,10 +20,9 @@
 
 (define crear-documento
   (lambda (dia mes año nombre-documento usuario ID-documento contenido versión-documento)
-    (if (fecha? (crear-fecha dia mes año))
+    (if (documento? (list ID-documento usuario (crear-fecha dia mes año) nombre-documento (list (list versión-documento (crear-fecha dia mes año) contenido )) '() ))
         (list ID-documento usuario (crear-fecha dia mes año) nombre-documento (list (list versión-documento (crear-fecha dia mes año) contenido )) '() )
-        '()
-        )
+        null)
     )
   )
 
@@ -110,15 +111,28 @@
 #|
 
 ;EJEMPLOS CONSTRUCTOR:
+; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
+; ...adicionalmente: (define ejemplo-crear-usuario-1 (crear-usuario 19 10 2021 "Angel" "contraseña"))
+; ...adicionalmente: (define ejemplo-crear-usuario-2 (crear-usuario 20 10 2021 "Jaime" "pinturaceresita"))
+; ...adicionalmente: (define ejemplo-modificar-lista-usuarios-2 (modificar-lista-usuarios emptyGDocs ejemplo-crear-usuario-2))
+; ...adicionalmente: (define ejemplo-modificar-lista-usuarios-3 (modificar-lista-usuarios ejemplo-modificar-lista-usuarios-2 ejemplo-crear-usuario-1))
+; ...adicionalmente: (define paradigmadocs (agregar-y-remover "Angel" ejemplo-modificar-lista-usuarios-3))
+; lo anterior es basicamente register
 
+(define ejemplo-crear-documento-1 (crear-documento
+                                   25 10 2021 "Gdocs" (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-documento (get-dato paradigmadocs 5) 0) "PRIMER TEXTO" 0))
+(define ejemplo-crear-documento-2 (crear-documento
+                                   30 12 2021 "DOC" (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-documento (get-dato paradigmadocs 5) 0) "INFORME" 0))
+(define ejemplo-crear-documento-3 (crear-documento
+                                   4 5 2025 "TXT" (buscar-usuario-activo (get-dato ejemplo-modificar-lista-usuarios-3 4)) (ID-documento (get-dato ejemplo-modificar-lista-usuarios-3 5) 0) "BORRADOR" 0))
+; El tercer ejemplo expresa una situación no valida
 
+;EJEMPLOS PERTENENCIA:
+(define ejemplo-documento?-1 (documento? ejemplo-crear-documento-1))
+(define ejemplo-documento?-2 (documento? ejemplo-crear-documento-2))
+(define ejemplo-documento?-3 (documento? ejemplo-crear-documento-3))
 
-
-
-
-(define doc (crear-documento 25 10 2021 "doc" "ANGEL" (ID-documento '( '() '() ) 0)))
-
-
+;EJEMPLOS 
 
 |#
 

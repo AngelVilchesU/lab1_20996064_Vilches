@@ -29,10 +29,11 @@
 
 (define login
   (lambda (paradigmadocs usuario contraseña operación)
-    (if (and (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #t ) (equal? (contraseña-repetida? (get-dato paradigmadocs 4) contraseña) #t ))
+    (lambda (fecha nombre-documento contenido)
+    (if (and (equal? (usuario-repetido? (get-dato paradigmadocs 4) usuario) #t ) (equal? (esta-contraseña? (get-dato paradigmadocs 4) contraseña) #t ))
         (if (procedure? operación)
             (if (equal? operación create)
-                "create (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)|||||||||||||||||||||||||||||||||||||
+                ((create (agregar-y-remover usuario paradigmadocs)) fecha nombre-documento contenido)
                 (if (equal? operación share)
                     "share (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
                     (if (equal? operación add)
@@ -54,20 +55,37 @@
                 )
             #f)
         #f)
+      )
+    )
+  )
+; Descripción: Función que permite a un usuario con sesión iniciada en la plataforma definida crear un documento de texto de modo que en este...
+;              ... se registre al autor, fecha de creación, nombre del documento y su contenido retornando una versión actualizada de acuerdo...
+;              ... a los parámetros ingresados en paralelo con la eliminación de la sesión activa del usuario/creador correspondiente
+; Dominio: paradigmadocs X (date) X nombre-documento X contenido
+; Recorrido: Actualización de paradigmadocs
+
+(define create
+  (lambda (paradigmadocs)
+    (lambda (fecha nombre-documento contenido)
+      (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+          (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4))
+                             (list (get-dato paradigmadocs 0)
+                                   (get-dato paradigmadocs 1)
+                                   (get-dato paradigmadocs 2)
+                                   (get-dato paradigmadocs 3)
+                                   (get-dato paradigmadocs 4)
+                                   (set-lista (get-dato paradigmadocs 5)
+                                              (crear-documento
+                                               (get-dia fecha) (get-mes fecha) (get-año fecha) nombre-documento (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-documento (get-dato paradigmadocs 5) 0) ((get-dato paradigmadocs 2) contenido) 0)
+                                              )
+                                   )
+                             )
+          #f)
+      )
     )
   )
 
-(define create
-  (lambda (paradigmadocs dia mes año nombre-documento contenido)
-    (list (get-dato paradigmadocs 0)
-          (get-dato paradigmadocs 1)
-          (get-dato paradigmadocs 2)
-          (get-dato paradigmadocs 3)
-          (get-dato paradigmadocs 4)
-          (set-lista (get-dato paradigmadocs 5)
-                     (crear-documento
-                      dia mes año nombre-documento (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-documento (get-dato paradigmadocs 5) 0) contenido 0)
-                                              ))))
+
 
 
 
@@ -101,16 +119,23 @@
 
 #|
 EJEMPLOS register:
-(register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") ; Las funciones "encryptFn" deben ser llamadas sin comillas (procedimiento) una vez realizada la función enriptadora
-(register (register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") 19 11 2021 "Milky" "guau")
-(register (register (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn") 17 10 2021 "Angel" "contraseña") 19 11 2021 "Angel" "cerealTrix") ; Este ejemplo expresa una situación no valida pues el nombre de usuario ya existe
+; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
+(define emptyGDocs1 (register emptyGDocs 19 10 2021 "Angel" "contraseña"))
+(define emptyGDocs2 (register emptyGDocs1 20 10 2021 "Jaime" "pinturaceresita"))
+(define emptyGDocs-novalido (register emptyGDocs2 19 10 2021 "Angel" "USUARIO REPETIDO"))
+PENDIENTE
+; El tercer ejemplo expresa una situación no valida (nombre de usuario repetido) por lo que no se agrerga el usuario
+
+EJEMPLOS login:
+(define emptyGDocs3 ((login emptyGDocs2 "Jaime" "pinturaceresita" create) (30 08 2021) "doc0" "HOLA"))
 
 
-> (define paradigmadocs (paradigmadocs "gDocs" 16 10 2021 "encryptFn" "encryptFn"))
-> (define paradigmadocs2 (register paradigmadocs 19 10 2021 "Angel" "contraseña"))
-> (define paradigmadocs3 (register paradigmadocs2 20 10 2021 "Jaime" "pinturaceresita"))
+
+
+
+
 > (define paradigmadocs4 (login paradigmadocs3 "Jaime" "pinturaceresita" "a"))
-> (define paradigmadocs5 (agregar-y-remover (get-dato paradigmadocs3 4) "Jaime" paradigmadocs3))
+> (define paradigmadocs5 (agregar-y-remover "Jaime" paradigmadocs3))
 > (define paradigmadocs6 (create paradigmadocs5 26 10 2021 "Doc" "AAAA"))
 > 
 
