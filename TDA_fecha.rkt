@@ -8,7 +8,7 @@
 
 ; Constructor: Función que permite la creación de una fecha en formato DD MM AA de acuerdo con...
 ;              ... tres valores enteros dados representando al dia, mes y año respectivamente
-; Dominio: Lista de tres valores/números enteros
+; Dominio: integer X integer X integer
 ; Recorrido: Lista correspondiente a la fecha
 
 (define crear-fecha
@@ -23,7 +23,7 @@
 ; Descripción: Función que permite veríficar si los elementos ingresados corresponden a los...
 ;              ... considerados en el constructor de fechas
 ; Dominio: Lista fecha
-; Recorrido: Valor booleano que confirma o no 
+; Recorrido: Valor booleano que confirma, o no, la validez de la fecha
 
 (define fecha?
   (lambda (fecha)
@@ -46,7 +46,7 @@
 ; Selectores (es importante destacar que no se emplean filtros verificadores de datos ya que se encuentran...
 ; ... en las funciones contructor y pertenencia las cuales deben ejecutarse previamente a los selectores):
 ; Descripción: Función que permite la obtención del día registrado
-; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Dominio: Lista de enteros correspondiente a la fecha en formato DD MM AA
 ; Recorrido: Entero correspondiente al día
 
 (define get-dia
@@ -58,7 +58,7 @@
   )
 
 ; Descripción: Función que permite la obtención del mes registrado
-; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Dominio: Lista de enteros correspondiente a la fecha en formato DD MM AA
 ; Recorrido: Entero correspondiente al mes
 
 (define get-mes
@@ -70,7 +70,7 @@
   )
 
 ; Descripción: Función que permite la obtención del año registrado
-; Dominio: Lista correspondiente a la fecha en formato DD MM AA
+; Dominio: Lista de enteros correspondiente a la fecha en formato DD MM AA
 ; Recorrido: Entero correspondiente al año
 
 (define get-año
@@ -104,7 +104,9 @@
   (lambda (fecha nuevo-mes)
     (if (fecha? (list (get-dia fecha) nuevo-mes (get-año fecha)))
         (list (get-dia fecha) nuevo-mes (get-año fecha))
-              #f)))
+              #f)
+    )
+  )
 
 ; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
 ;              ... cambiando el dato correspondiente, en este caso, el año
@@ -115,7 +117,9 @@
   (lambda (fecha nuevo-año)
     (if (fecha? (list (get-dia fecha) (get-mes fecha) nuevo-año))
         (list (get-dia fecha) (get-mes fecha) nuevo-año)
-              #f)))
+              #f)
+    )
+  )
 
 ; Otras funciones:
 
@@ -126,7 +130,10 @@
 ; Recorrido: Un resultado booleando el cual indica si el año ingresado posee 365 días o 366 días (bisiesto)
 
 (define (bisiesto? año)
-  (if (exact-integer?(/ año 4)) #t #f))
+  (if (exact-integer? (/ año 4))
+      #t
+      #f)
+  )
 
 ; Descripción: Función que considera la obtención de los días de un mes en consideración con si el año ingresado...
 ;              ... es bisiesto o no
@@ -134,13 +141,18 @@
 ; Recorrido: Un entero correspondiente a los días del mes ingresado considerando el año (bisiesto o no)
 
 (define (dias-del-mes mes año)
-  (if (or (= mes 1) (= mes 3) (= mes 5) (= mes 7) (= mes 8) (= mes 10) (= mes 12)) 31
+  (if (or (= mes 1) (= mes 3) (= mes 5) (= mes 7) (= mes 8) (= mes 10) (= mes 12))
+      31
       (if (= mes 2)
-          (if (bisiesto? año) 29 28)
-          30)))
+          (if (bisiesto? año)
+              29
+              28)
+          30)
+      )
+  )
 
-#|
-------------------------------------------------------------------------------------------------------
+
+;------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
 (define ejemplo-crear-fecha-1 (crear-fecha 18 10 2021))
 (define ejemplo-crear-fecha-2 (crear-fecha 22 11 2021))
@@ -194,7 +206,7 @@
 (define ejemplo-dias-del-mes-1 (dias-del-mes 2 2021))
 (define ejemplo-dias-del-mes-2 (dias-del-mes 2 2024))
 (define ejemplo-dias-del-mes-3 (dias-del-mes 12 2030))
-------------------------------------------------------------------------------------------------------
-|#
+;------------------------------------------------------------------------------------------------------
+
 
 (provide (all-defined-out))
