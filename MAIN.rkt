@@ -183,7 +183,7 @@
     (lambda (frase)
       ; condicional: si existe un usuario activo
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-          (filter (llamado-valido? (buscar-usuario-activo (get-dato paradigmadocs 4))) (filter (verificador-de-substring frase) (get-dato paradigmadocs 5)))
+          (filter (llamado-valido? (buscar-usuario-activo (get-dato paradigmadocs 4))) (filter (llamado-verificador-de-substring frase) (get-dato paradigmadocs 5)))
           null)
       )
     )
@@ -241,11 +241,9 @@
 |#
 
 
+(define gDocs0 (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
 
-
-(define emptyGDocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
-
-(define gDocs1 (register (register (register emptyGDocs (crear-fecha 25 10 2021) "user1" "pass1") (crear-fecha 25 10 2021) "user2"
+(define gDocs1 (register (register (register gDocs0 (crear-fecha 25 10 2021) "user1" "pass1") (crear-fecha 25 10 2021) "user2"
 "pass2") (crear-fecha 25 10 2021) "user3" "pass3"))
 
 (define gDocs2 ((login gDocs1 "user1" "pass1" create) (crear-fecha 30 08 2021) "doc0" "contenido doc0"))
@@ -268,7 +266,7 @@
 
 (define gDocs16 (login gDocs15 "user2" "pass2" revokeAllAccesses))
 
-((login gDocs16 "user1" "pass1" search) "contenido")
+;((login gDocs16 "user1" "pass1" search) "contenido")
 
 
 

@@ -118,9 +118,6 @@
     )
   )
 
-
-
-
 ; Descripción
 ; Dominio:
 ; Recorrido:
@@ -129,27 +126,34 @@
 
 ;--------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
-(define emptyGDocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
-(define emptyGDocs-2 (paradigmadocs "gWord" (crear-fecha 17 10 2021) encryptFn encryptFn))
-(define emptyGDocs-3 (paradigmadocs "gTXT" (crear-fecha 18 13 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs-2 (paradigmadocs "gWord" (crear-fecha 17 10 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs-3 (paradigmadocs "gTXT" (crear-fecha 18 13 2021) encryptFn encryptFn))
 ; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:
-(define ejemplo-paradigmadocs?-1 (paradigmadocs? emptyGDocs))
-(define ejemplo-paradigmadocs?-2 (paradigmadocs? emptyGDocs-2))
-(define ejemplo-paradigmadocs?-3 (paradigmadocs? emptyGDocs-3))
+(define ejemplo-paradigmadocs?-1 (paradigmadocs? ejemplo-paradigmadocs))
+(define ejemplo-paradigmadocs?-2 (paradigmadocs? ejemplo-paradigmadocs-2))
+(define ejemplo-paradigmadocs?-3 (paradigmadocs? ejemplo-paradigmadocs-3))
 ; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS SELECTOR:
-(define ejemplo-get-dato-1 (get-dato emptyGDocs 0))
-(define ejemplo-get-dato-2 (get-dato emptyGDocs 1))
-(define ejemplo-get-dato-3 (get-dato emptyGDocs-2 5))
+(define ejemplo-get-dato-1 (get-dato ejemplo-paradigmadocs 0))
+(define ejemplo-get-dato-2 (get-dato ejemplo-paradigmadocs 1))
+(define ejemplo-get-dato-3 (get-dato ejemplo-paradigmadocs-2 5))
 
 ;EJEMPLOS MODIFICADOR:
-(define ejemplo-set-act-list-doc-paradigmadocs-1 (set-act-list-doc-paradigmadocs emptyGDocs (list "modificación del TDA documentos. EJ: creación de documento")))
-(define ejemplo-set-act-list-doc-paradigmadocs-2 (set-act-list-doc-paradigmadocs emptyGDocs (list "modificación del TDA documentos. EJ: otra creación de documento")))
-(define ejemplo-set-act-list-doc-paradigmadocs-3 (set-act-list-doc-paradigmadocs emptyGDocs-2 (list "modificación del TDA documentos. EJ: revocar accesos")))
+(define ejemplo-set-act-list-doc-paradigmadocs-1 (set-act-list-doc-paradigmadocs ejemplo-paradigmadocs (list "modificación del TDA documentos. EJ: creación de documento")))
+(define ejemplo-set-act-list-doc-paradigmadocs-2 (set-act-list-doc-paradigmadocs ejemplo-paradigmadocs (list "modificación del TDA documentos. EJ: otra creación de documento")))
+(define ejemplo-set-act-list-doc-paradigmadocs-3 (set-act-list-doc-paradigmadocs ejemplo-paradigmadocs-2 (list "modificación del TDA documentos. EJ: revocar accesos")))
 
+(define ej-set-act-list-usuarios-paradigmadocs-1 (set-act-list-usuarios-paradigmadocs ejemplo-paradigmadocs (list "Entrada de un usuario de un usuario")))
+(define ej-set-act-list-usuarios-paradigmadocs-2 (set-act-list-usuarios-paradigmadocs ejemplo-paradigmadocs (list "Salida de un usuario")))
+(define ej-set-act-list-usuarios-paradigmadocs-3 (set-act-list-usuarios-paradigmadocs ejemplo-paradigmadocs-2 (list "Log de un usuario")))
+
+(define ejemplo-anexar-listas-1 (anexar-listas (list (list "lista base")) (list "nueva lista")))
+(define ejemplo-anexar-listas-2 (anexar-listas (list (list 0 1 2)) (list 3 4 5)))
+(define ejemplo-anexar-listas-3 (anexar-listas (list (list "user1" "pass1" "activo/inactivo")) (list "user2" "pass2" "activo/inactivo")))
 ;--------------------------------------------------------------------------------------------------------------------------------------------
 
 

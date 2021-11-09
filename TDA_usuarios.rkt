@@ -314,19 +314,17 @@
 ; El tercer ejemplo expresa una situación no valida
 
 ;EJEMPLOS MODIFICADORES:
-; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
-(define ejemplo-set-act-list-usuarios-paradigmadocs-1 (set-act-list-usuarios-paradigmadocs emptyGDocs ejemplo-crear-usuario-1))
-(define ejemplo-set-act-list-usuarios-paradigmadocs-2 (set-act-list-usuarios-paradigmadocs emptyGDocs ejemplo-crear-usuario-2))
+; ...previamente definida la plataforma a emplear: "(define ejemplo-paradigmadocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
+(define ejemplo-set-act-list-usuarios-paradigmadocs-1 (set-act-list-usuarios-paradigmadocs ejemplo-paradigmadocs ejemplo-crear-usuario-1))
+(define ejemplo-set-act-list-usuarios-paradigmadocs-2 (set-act-list-usuarios-paradigmadocs ejemplo-paradigmadocs ejemplo-crear-usuario-2))
 (define ejemplo-set-act-list-usuarios-paradigmadocs-3 (set-act-list-usuarios-paradigmadocs ejemplo-set-act-list-usuarios-paradigmadocs-2 ejemplo-crear-usuario-1))
 
 ;EJEMPLOS OTRAS FUNCIONES:
-; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
-(define ejemplo-anexar-listas-1 (anexar-listas (get-dato emptyGDocs 4) ejemplo-crear-usuario-1))
-(define ejemplo-anexar-listas-2 (anexar-listas (get-dato emptyGDocs 4) ejemplo-crear-usuario-2))
-(define ejemplo-anexar-listas-3 (anexar-listas ejemplo-anexar-listas-1 ejemplo-crear-usuario-2))
+; ...previamente definida la plataforma a emplear: "(define ejemplo-paradigmadocs (paradigmadocs "gDocs" 16 10 2021 encryptFn encryptFn))"
 
-(define ejemplo-esta-usuario?-1 (esta-usuario? (get-dato emptyGDocs 4) "Angel"))
-(define ejemplo-esta-usuario?-2 (esta-usuario? (get-dato emptyGDocs 4) "Jaime"))
+
+(define ejemplo-esta-usuario?-1 (esta-usuario? (get-dato ejemplo-paradigmadocs 4) "Angel"))
+(define ejemplo-esta-usuario?-2 (esta-usuario? (get-dato ejemplo-paradigmadocs 4) "Jaime"))
 (define ejemplo-esta-usuario?-3 (esta-usuario? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-1 4) "Angel"))
 
 ; Las siguientes funciones "set-act-ina-usuario" y "remover-list-usuario-act-ina" funcionan de forma complementaria

@@ -150,6 +150,16 @@
     )
   ))
 
+; Descripción:
+; Dominio:
+; Recorrido:
+
+(define get-primera-lista
+  (lambda (lista-de-listas)
+    (car lista-de-listas))
+    )
+  
+
 
 ; Modificador:
 ; Descripción: Función que permite la inserción de un valor entero de versión a una lista de versionamiento pertenenciente al TDA
@@ -427,7 +437,7 @@
     (if (null? lista-base)
         #f
         ; ¿El primer elemento de la primera lista considerada es equivalente al usuario buscado y su segundo elemento corresponde al permiso y/o acceso de escritura?
-        (if (and (equal? (get-usuario-compartido (car lista-base)) usuario) (equal? (get-acceso-compartido (car lista-base)) #\r))
+        (if (and (equal? (get-usuario-compartido (car lista-base)) usuario) (equal? (get-acceso-compartido (car lista-base)) #\w))
             #t
             ; Llamado recursivo retornando la función, resto de las listas y el usuario
             (buscar-usuario-editor (cdr lista-base) usuario))
@@ -520,9 +530,9 @@
     )
   )
 
-;-------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-(define complemento
+
+(define verificador-de-substring
   (lambda (frase lista-versiones)
     (if (null? lista-versiones)
         #f
@@ -530,16 +540,16 @@
             #t
             (if (null? (cdr lista-versiones))
                 #f
-                (complemento frase (cdr lista-versiones)))
+                (verificador-de-substring frase (cdr lista-versiones)))
             )
         )
     )
   )
 
-(define verificador-de-substring
+(define llamado-verificador-de-substring
   (lambda (frase)
     (lambda (documento)
-      (complemento frase (get-dato-doc documento 4))
+      (verificador-de-substring frase (get-dato-doc documento 4))
       )
     )
   )
@@ -586,11 +596,11 @@
         #f
         ; ¿El primer elemento de la primera lista considerada es equivalente al usuario buscado y su segundo elemento corresponde al permiso y/o acceso de escritura?
         (if (equal? (get-dato-doc documento 1) usuario)
-                #t
-            #f
+            #t
+            #f)
         )
     )
-  ))
+  )
 
 
 
@@ -599,44 +609,25 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-#|
-'(1 "user1" (30 8 2021) "doc1" ((0 (30 8 2021) "1cod odinetnoc")) (("user2" #\r))) -> '((0 (30 8 2021) "1cod odinetnoc"))
-(filter (verificador-de-substring "contenid") '((0 (30 8 2021) "1cod odinetnoc")))
-
-(filter (verificador-de-substring "contenid") '('(1 "user1" (30 8 2021) "doc1" ((0 (30 8 2021) "1cod odinetnoc")) (("user2" #\r)))))
-(filter (verificador-de-substring "contenid") (list (list 1 "user1" (list 30 8 2021) "doc1" (list (list 0 (list 30 8 2021) "1cod odinetnoc")) (list (list "user2" #\r)))))
-|#
-
-
-
-#|
-
+;------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
+; Las siguientes funciones son necesarias para la correcta ejecución de los ejemplos. Asimismo, las funciones comentadas se encuentran definidas y exportadas...
+; ... desde los TDA_usuarios y TDA_paradigmadocs.
 ; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))"
 ; ...adicionalmente: (define ejemplo-crear-usuario-1 (crear-usuario (crear-fecha 19 10 2021) "Angel" "contraseña"))
 ; ...adicionalmente: (define ejemplo-crear-usuario-2 (crear-usuario (crear-fecha 20 10 2021) "Jaime" "pinturaceresita"))
 ; ...adicionalmente: (define ejemplo-set-act-list-usuarios-paradigmadocs-2 (set-act-list-usuarios-paradigmadocs emptyGDocs ejemplo-crear-usuario-2))
 ; ...adicionalmente: (define ejemplo-set-act-list-usuarios-paradigmadocs-3 (set-act-list-usuarios-paradigmadocs ejemplo-set-act-list-usuarios-paradigmadocs-2 ejemplo-crear-usuario-1))
-; ...adicionalmente: (define paradigmadocs (agregar-y-remover "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
-; lo anterior es basicamente register
+; ...adicionalmente:
+(define plataforma (agregar-y-remover "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
+; lo anterior es basicamente register (con el usuario "Angel" logeado)
 
 (define ejemplo-crear-documento-1 (crear-documento
-                                   (crear-fecha 25 10 2021) "Gdocs" (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-version-doc (get-dato paradigmadocs 5) 0) "PRIMER TEXTO" 0))
+                                   (crear-fecha 25 10 2021) "Gdocs" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) -1) "PRIMER TEXTO" 0))
 (define ejemplo-crear-documento-2 (crear-documento
-                                   (crear-fecha 30 12 2021) "DOC" (buscar-usuario-activo (get-dato paradigmadocs 4)) (ID-version-doc (get-dato paradigmadocs 5) 0) "INFORME" 0))
+                                 (crear-fecha 30 12 2021) "DOC" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) 0) "INFORME" 0))
 (define ejemplo-crear-documento-3 (crear-documento
-                                   (crear-fecha 4 5 2025) "TXT" (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)) (ID-version-doc (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 5) 0) "BORRADOR" 0))
+                                (crear-fecha 4 5 2025) "TXT" (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)) (ID-version-doc (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 5) 0) "BORRADOR" 0))
 ; El tercer ejemplo expresa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:
@@ -646,35 +637,280 @@
 
 ;EJEMPLOS SELECTORES:
 (define ejemplo-get-dato-doc-1 (get-dato-doc ejemplo-crear-documento-1 0))
-(define ejemplo-get-dato-doc-1 (get-dato-doc ejemplo-crear-documento-1 4))
-(define ejemplo-get-dato-doc-2 (get-dato-doc ejemplo-crear-documento-2 3))
+(define ejemplo-get-dato-doc-2 (get-dato-doc ejemplo-crear-documento-1 4))
+(define ejemplo-get-dato-doc-3 (get-dato-doc ejemplo-crear-documento-2 3))
 
-;EJEMPLO MODIFICADORES:
-(define ejemplo-modificar-lista-compartidos-1 (modificar-lista-compartidos paradigmadocs (list (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 0)
-(define ejemplo-modificar-lista-compartidos-2 (modificar-lista-compartidos paradigmadocs (list "Cale" #\c)))
-(define ejemplo-modificar-lista-compartidos-3 (modificar-lista-compartidos ejemplo-modificar-lista-compartidos-2 (list "Laysa" #\r)))  
-; Función que implementa la función share de forma muy similar, sin embargo se debe considerar el usuario activo, id del documento y la unión de listas más que listas de listas.
-; Por ende, su implementación está orientada al de una función complementaria dentro de share
+(define ejemplo-get-version-doc-1 (get-version-doc (get-primera-lista (get-dato-doc ejemplo-crear-documento-1 4))))
+(define ejemplo-get-version-doc-2 (get-version-doc (get-primera-lista (get-dato-doc ejemplo-crear-documento-2 4))))
+(define ejemplo-get-version-doc-3 (get-version-doc (list 7 (list 25 10 2021) "EJEMPLO DE ARGUMENTO IDEAL")))
 
-;EJEMPLO OTRAS FUNCIONES:
-(define ejemplo-ID-version-doc-1 (ID-version-doc (get-dato ejemplo-modificar-lista-compartidos-1 5) 0 ))
-(define ejemplo-ID-version-doc-2 (ID-version-doc (get-dato ejemplo-modificar-lista-compartidos-2 5) 0 ))
-(define ejemplo-ID-version-doc-3 (ID-version-doc (get-dato ejemplo-modificar-lista-compartidos-3 5) 0 ))
+(define ejemplo-ultima-version-1 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA Y ÚLTIMA VERSIÓN"))))
+(define ejemplo-ultima-version-2 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA Y ÚLTIMA VERSIÓN"))))
+(define ejemplo-ultima-version-3 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))))
 
-; Lo que se espera es ingresar la lista de listas contenedoras del versionamiento de determinado documento de forma que de acuerdo con...
-; ...el número de listas en su interior (versiones) se indique el número de versión que debe adoptar la siguiente lista para continuar de..
-; ...forma correlativa. Es importante comentar que no es posible ingresar un parámetro genérico para efectos de ejemplificación de la presente...
-; ...función, pues el elemento se encuentra y/o determina en MAIN.rkt de modo que habría que anexar dicho archivo a este documento, sin embargo,
-; ...aquello ocasionaría un error ya que se produce un llamado de ambas partes para funcionar (no válido)
-(define ejemplo-version-documento-1 (version-documento '( '(0 (30 8 2021) "2cod odinetnoc") '(0 (30 8 2021) "A") ) 0))
-(define ejemplo-version-documento-2 (version-documento '( '(0 (30 8 2021) "2cod odinetnoc")) 0))
-(define ejemplo-version-documento-3 (version-documento '( '(0 (30 8 2021) "2cod odinetnoc") '(0 (30 8 2021) "A") '(0 (30 8 2021) "UWU") ) 0))
+(define ejemplo-n-version-lista-1 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                   0))
+(define ejemplo-n-version-lista-2 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                   2))
+(define ejemplo-n-version-lista-3 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                   4))
+(define ejemplo-get-usuario-compartido-1 (get-usuario-compartido (list "USUARIO" #\r)))
+(define ejemplo-get-usuario-compartido-2 (get-usuario-compartido
+                                          (get-primera-lista
+                                           (get-dato-doc (list 0 "Angel" (list 25 10 2021) "Gdocs" (list (list 0 (list 25 10 2021) "PRIMER TEXTO")) (list (list "USUARIO" #\r))) 5))))
+(define ejemplo-get-usuario-compartido-3 (get-usuario-compartido
+                                          (get-primera-lista (list (list "USUARIO" #\r)))))
+
+(define ejemplo-get-acceso-compartido-1 (get-acceso-compartido (list "USUARIO" #\r)))
+(define ejemplo-get-acceso-compartido-2 (get-acceso-compartido
+                                          (get-primera-lista
+                                           (get-dato-doc (list 0 "Angel" (list 25 10 2021) "Gdocs" (list (list 0 (list 25 10 2021) "PRIMER TEXTO")) (list (list "USUARIO" #\r))) 5))))
+(define ejemplo-get-acceso-compartido-3 (get-acceso-compartido
+                                          (get-primera-lista (list (list "USUARIO" #\r)))))
+
+(define ejemplo-get-contenido-1 (get-contenido (get-primera-lista (get-dato-doc ejemplo-crear-documento-1 4))))
+(define ejemplo-get-contenido-2 (get-contenido (get-primera-lista (get-dato-doc ejemplo-crear-documento-2 4))))
+(define ejemplo-get-contenido-3 (get-contenido (get-primera-lista (list (list 0 (list 25 10 2021) "PARA OBTENER OTRAS LISTAS SE APLICA RECURSIÓN")))))
+
+(define ejemplo-get-primera-lista-1 (get-primera-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA Y ÚLTIMA VERSIÓN"))))
+(define ejemplo-get-primera-lista-2 (get-primera-lista (list (list 0 (list 25 10 2021) "PARA OBTENER OTRAS LISTAS SE APLICA RECURSIÓN"))))
+(define ejemplo-get-primera-lista-3 (get-primera-lista (list (list "USUARIO" #\r)
+                                                             (list "USUARIO2" #\w))))
+
+(define ejemplo-set-version-doc-1 (set-version-doc (list 0 (list 25 10 2021) "ESTA DEBE SER LA VERSIÓN TRES")
+                                                   (ID-version-doc (list
+                                                                    (list 0 (list 25 10 2021) "VERSIÓN CERO")
+                                                                    (list 1 (list 25 10 2021) "VERSIÓN UNO")
+                                                                    (list 2 (list 25 10 2021) "VERSIÓN DOS"))
+                                                                   -1)))
+(define ejemplo-set-version-doc-2 (set-version-doc (list 0 (list 25 10 2021) "ESTA DEBE SER LA VERSIÓN UNO")
+                                                   (ID-version-doc (list
+                                                                    (list 0 (list 25 10 2021) "VERSIÓN CERO"))
+                                                                   -1)))
+(define ejemplo-set-version-doc-3 (set-version-doc (list 0 (list 25 10 2021) "ESTA DEBE SER LA VERSIÓN UNO")
+                                                   (ID-version-doc (get-dato-doc ejemplo-crear-documento-1 4)
+                                                                   -1)))
+
+(define ejemplo-set-list-compartido-1 (set-list-compartido ejemplo-crear-documento-1))
+(define ejemplo-set-list-compartido-2 (set-list-compartido ejemplo-crear-documento-2))
+;(define ejemplo-set-list-compartido-3 (set-list-compartido ejemplo-crear-documento-3))
+; El tercer ejemplo representa una situación no válida
+
+; EJEMPLO agregar-usuario-compartido
+; EJEMPLO agregar-usuario-compartido
+; EJEMPLO agregar-usuario-compartido
+
+; EJEMPLO agregar-version-doc
+; EJEMPLO agregar-version-doc
+; EJEMPLO agregar-version-doc
+
+; EJEMPLO restaurar
+; EJEMPLO restaurar
+; EJEMPLO restaurar
+
+(define ejemplo-ID-version-doc-1 (ID-version-doc (list
+                                                  (list 0 (list 25 10 2021) "VERSIÓN CERO")
+                                                  (list 1 (list 25 10 2021) "VERSIÓN UNO")
+                                                  (list 2 (list 25 10 2021) "VERSIÓN DOS"))
+                                                 -1))
+(define ejemplo-ID-version-doc-2 (ID-version-doc (list (list 0 (list 25 10 2021) "VERSIÓN CERO")
+                                                       (list 1 (list 25 10 2021) "VERSIÓN UNO")
+                                                       (list 2 (list 25 10 2021) "VERSIÓN DOS")
+                                                       (list 3 (list 25 10 2021) "VERSIÓN TRES")
+                                                       (list 4 (list 25 10 2021) "VERSIÓN CUATRO"))
+                                                 -1))
+(define ejemplo-ID-version-doc-3 (ID-version-doc (get-dato-doc ejemplo-crear-documento-1 4)
+                                                                   -1))
+(define ejemplo-access-1 (access (list "USER1" "PASS1")))
+(define ejemplo-access-2 (access (list "USER1" "PASS1") (list "USER2" "PASS2")))
+(define ejemplo-access-3 (access (list "USER1" "PASS1") (list "USER2" "PASS2") (list "USER3" "PASS3") (list "USER4" "PASS4")))
+
+(define ejemplo-buscar-Id-documento-1 (buscar-Id-documento (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                           3))
+(define ejemplo-buscar-Id-documento-2 (buscar-Id-documento (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                           1))
+(define ejemplo-buscar-Id-documento-3 (buscar-Id-documento (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                                           4))
+
+; EJEMPLO remov-lista-repet
+; EJEMPLO remov-lista-repet
+; EJEMPLO remov-lista-repet
+
+; EJEMPLO agregar-y-remover-compartido
+; EJEMPLO agregar-y-remover-compartido
+; EJEMPLO agregar-y-remover-compartido
+
+; EJEMPLO agregar-remover-doc
+; EJEMPLO agregar-remover-doc
+; EJEMPLO agregar-remover-doc
+
+(define ejemplo-n-version-1 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                       1))
+(define ejemplo-n-version-2 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                       2))
+(define ejemplo-n-version-3 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                       5))
+
+(define ejemplo-buscar-usuario-editor-1 (buscar-usuario-editor (list (list "USUARIO" #\r)
+                                                             (list "USUARIO2" #\w)
+                                                             (list "USUARIO3" #\c)
+                                                             (list "USUARIO4" #\w))
+                                                               "USUARIO2"))
+(define ejemplo-buscar-usuario-editor-2 (buscar-usuario-editor (list (list "USUARIO" #\r)
+                                                             (list "USUARIO2" #\w)
+                                                             (list "USUARIO3" #\c)
+                                                             (list "USUARIO4" #\w))
+                                                               "USUARIO"))
+(define ejemplo-buscar-usuario-editor-3 (buscar-usuario-editor (list (list "USUARIO" #\r)
+                                                             (list "USUARIO2" #\w)
+                                                             (list "USUARIO3" #\c)
+                                                             (list "USUARIO4" #\w))
+                                                               "USUARIO4"))
+
+; EJEMPLO remove-n-version-lista
+; EJEMPLO remove-n-version-lista
+; EJEMPLO remove-n-version-lista
+
+; EJEMPLO agregar-remover-version
+; EJEMPLO agregar-remover-version
+; EJEMPLO agregar-remover-version
+
+(define ejemplo-correlativo-1 (correlativo (list (list 1 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 5 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 0 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 1 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                           0
+                                           (list )))
+(define ejemplo-correlativo-2 (correlativo (list (list -1 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list -2 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list -3 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list -4 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list -5 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                           0
+                                           (list )))
+(define ejemplo-correlativo-3 (correlativo (list (list 1000 (list 25 10 2021) "PRIMERA VERSIÓN")
+                                                       (list 115 (list 25 10 2021) "SEGUNDA VERSIÓN")
+                                                       (list 550 (list 25 10 2021) "TERCERA VERSIÓN")
+                                                       (list 0 (list 25 10 2021) "CUARTA VERSIÓN")
+                                                       (list 19 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
+                                           0
+                                           (list )))
+
+(define ejemplo-filtrador-doc-1 (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "Angel"))
+(define ejemplo-filtrador-doc-2 (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "Benjamin"))
+(define ejemplo-filtrador-doc-3 (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "ANGEL"))
+
+(define ejemplo-concatenador-1 (concatenador (list ejemplo-crear-documento-1 ejemplo-crear-documento-2)
+                                             (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "Angel")))
+(define ejemplo-concatenador-2 (concatenador (list ejemplo-crear-documento-1 ejemplo-crear-documento-2)
+                                             (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "Benjamin")))
+(define ejemplo-concatenador-3 (concatenador (list ejemplo-crear-documento-1 ejemplo-crear-documento-2)
+                                             (map set-list-compartido
+                                                  (filtrador-doc (list ejemplo-crear-documento-1 ejemplo-crear-documento-2) "Angel"))))
+
+(define ejemplo-verificador-de-substring-1 (verificador-de-substring "PRIMERA"
+                                                                     (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                                           (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                                           (list 2 (list 25 10 2021) (encryptFn "TERCERA VERSIÓN"))
+                                                                           (list 3 (list 25 10 2021) (encryptFn "CUARTA VERSIÓN"))
+                                                                           (list 4 (list 25 10 2021) (encryptFn "QUINTA Y ÚLTIMA VERSIÓN")))
+                                                                     ))
+(define ejemplo-verificador-de-substring-2 (verificador-de-substring "QUINTA"
+                                                                     (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                                           (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                                           (list 2 (list 25 10 2021) (encryptFn "TERCERA VERSIÓN"))
+                                                                           (list 3 (list 25 10 2021) (encryptFn "CUARTA VERSIÓN"))
+                                                                           (list 4 (list 25 10 2021) (encryptFn "QUINTA Y ÚLTIMA VERSIÓN")))
+                                                                     ))
+(define ejemplo-verificador-de-substring-3 (verificador-de-substring "FRASE"
+                                                                     (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                                           (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                                           (list 2 (list 25 10 2021) (encryptFn "TERCERA VERSIÓN"))
+                                                                           (list 3 (list 25 10 2021) (encryptFn "CUARTA VERSIÓN"))
+                                                                           (list 4 (list 25 10 2021) (encryptFn "QUINTA Y ÚLTIMA VERSIÓN")))
+                                                                     ))
+
+(define ejemplo-llamado-verificador-de-substring-1 ((llamado-verificador-de-substring "PRIMERA") ejemplo-crear-documento-1))
+(define ejemplo-llamado-verificador-de-substring-2 ((llamado-verificador-de-substring "IRP") ejemplo-crear-documento-1)) ;RECORDAR EXISTENCIA DE ENCRYPTFN
+(define ejemplo-llamado-verificador-de-substring-3 ((llamado-verificador-de-substring "XET") ejemplo-crear-documento-1)) ;RECORDAR EXISTENCIA DE ENCRYPTFN
+
+(define ejemplo-llamado-valido?-1 ((llamado-valido? "ANGEL") ejemplo-crear-documento-1))
+(define ejemplo-llamado-valido?-2 ((llamado-valido? "Angel") ejemplo-crear-documento-1))
+(define ejemplo-llamado-valido?-3 ((llamado-valido? "USER") ejemplo-crear-documento-1))
+
+(define ejemplo-valido?-1 (valido? "ANGEL" ejemplo-crear-documento-1))
+(define ejemplo-valido?-2 (valido? "Angel" ejemplo-crear-documento-1))
+(define ejemplo-valido?-3 (valido? "USER" ejemplo-crear-documento-1))
+
+(define ejemplo-buscar-usuario-compartido-1 (buscar-usuario-compartido (list (list "USUARIO" #\r)
+                                                                             (list "USUARIO2" #\w)
+                                                                             (list "USUARIO3" #\c)
+                                                                             (list "USUARIO4" #\w))
+                                                                       "USUARIO3"))
+(define ejemplo-buscar-usuario-compartido-2 (buscar-usuario-compartido (list (list "USUARIO" #\r)
+                                                                             (list "USUARIO2" #\w)
+                                                                             (list "USUARIO3" #\c)
+                                                                             (list "USUARIO4" #\w))
+                                                                       "USUARIO4"))
+(define ejemplo-buscar-usuario-compartido-3 (buscar-usuario-compartido (list (list "USUARIO" #\r)
+                                                                             (list "USUARIO2" #\w)
+                                                                             (list "USUARIO3" #\c)
+                                                                             (list "USUARIO4" "ESCRIBIR"))
+                                                                       "USUARIO4"))
+
+(define ejemplo-buscar-usuario-propietario-1 (buscar-usuario-propietario ejemplo-crear-documento-1 "Angel"))
+(define ejemplo-buscar-usuario-propietario-2 (buscar-usuario-propietario ejemplo-crear-documento-1 "Cale"))
+(define ejemplo-buscar-usuario-propietario-3 (buscar-usuario-propietario ejemplo-crear-documento-1 "A"))
 
 
 
 
 
-|#
 
 
 
@@ -682,8 +918,6 @@
 
 
 
-
-
-
+;------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 (provide (all-defined-out))
