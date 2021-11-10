@@ -50,7 +50,7 @@
                                 (if (equal? operacion search)
                                     (search (agregar-y-remover usuario paradigmadocs))
                                     (if (equal? operacion paradigmadocs->string)
-                                        "paradigmadocs->string (entradas)" ;(agregar-y-remover (get-dato paradigmadocs 4) usuario paradigmadocs)
+                                        (paradigmadocs->string (agregar-y-remover usuario paradigmadocs))
                                         #f)
                                     )
                                 )
@@ -191,82 +191,116 @@
 
 
 (define paradigmadocs->string
-  "a")
+  (lambda (paradigmadocs)
+    ; condicional: si existe un usuario activo
+    (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+        (string-append (usuario->string (get-dato paradigmadocs 4) (buscar-usuario-activo (get-dato paradigmadocs 4)))
+                       (string-join (map (documento->string (buscar-usuario-activo (get-dato paradigmadocs 4)))
+                                         (map (propietario-compartido (buscar-usuario-activo (get-dato paradigmadocs 4))) (get-dato paradigmadocs 5)))))
+        (string-append "Nombre plataforma: " (get-dato paradigmadocs 0) "\n"
+                       "Fecha creación: " (fecha->string (get-dato paradigmadocs 1)) "\n"
+                       (string-join (usuarios->string (get-dato paradigmadocs 4)))
+                       (string-join (documentos->string (get-dato paradigmadocs 5))))
+    )
+  ))
+  
+; CASO LOG
+; IMPRIMIR USUARIO Y FECHA
+; IMPRIMIR DOCUMENTO Y SUS COMPONENTES (EN ORDEN E "ITERATIVO")
 
 
 
 
 
 
+; CREACIÓN DE LA PLATAFORMA PARADIGMADOCS
 
+(define gDocs-0 (paradigmadocs "Paradigmadocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
 
-#|
-; EJEMPLOS register:
-; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))"
-(define emptyGDocs1 (register emptyGDocs (crear-fecha 19 10 2021) "Angel" "contraseña"))
-(define emptyGDocs2 (register emptyGDocs1 (crear-fecha 20 10 2021) "Jaime" "pinturaceresita"))
-(define emptyGDocs-novalido (register emptyGDocs2 (crear-fecha 19 10 2021) "Angel" "USUARIO REPETIDO"))
-; El tercer ejemplo expresa una situación no valida (nombre de usuario repetido) por lo que no se agrerga el usuario
+; EJEMPLOS DE LA FUNCIÓN REGISTER
 
-; EJEMPLO SCRIPT ----------------------------------------------------------------------------------------------------------------------------------
-(define gDocs1 (register (register (register emptyGDocs (crear-fecha 25 10 2021) "user1" "pass1") (crear-fecha 25 10 2021) "user2"
-"pass2") (crear-fecha 25 10 2021) "user3" "pass3"))
-; -------------------------------------------------------------------------------------------------------------------------------------------------
+(define gDocs-1 (register
+                 (register
+                  (register
+                   gDocs-0
+                   (crear-fecha 25 10 2021) "user1" "pass1")
+                  (crear-fecha 25 10 2021) "user2" "pass2")
+                 (crear-fecha 25 10 2021) "user3" "pass3"))
+(define gDocs-2 (register
+                 gDocs-1 (crear-fecha 26 10 2021) "user4" "pass4"))
+(define gDocs-3 (register
+                 gDocs-2 (crear-fecha 27 10 2021) "user5" "pass5"))
 
-; EJEMPLOS login-create:
-(define emptyGDocs3 ((login emptyGDocs2 "Jaime" "pinturaceresita" create) (crear-fecha 30 08 2021) "doc0" "HOLA"))
-(define emptyGDocs4 ((login emptyGDocs3 "Angel" "contraseña" create) (crear-fecha 29 10 2021) "doc1" "ADIOS"))
-(define emptyGDocs-novalido ((login emptyGDocs2 "Jaime" "claveinvalida" create) (crear-fecha 30 08 2021) "doc2" "Un texto que no es"))
-; El tercer ejemplo expresa una situación no valida (contraseña no valida)
+; EJEMPLOS DE LA FUNCIÓN LOGIN-CREATE
 
-; EJEMPLOS SCRIPT ---------------------------------------------------------------------------------------------------------------------------------
-(define gDocs2 ((login gDocs1 "user1" "pass1" create) (crear-fecha 30 08 2021) "doc0" "contenido doc0"))
-(define gDocs3 ((login gDocs2 "user1" "pass1" create) (crear-fecha 30 08 2021) "doc1" "contenido doc1"))
-(define gDocs4 ((login gDocs3 "user2" "pass2" create) (crear-fecha 30 08 2021) "doc2" "contenido doc2"))
-(define gDocs5 ((login gDocs4 "user3" "pass3" create) (crear-fecha 30 08 2021) "doc3" "contenido doc3"))
-; -------------------------------------------------------------------------------------------------------------------------------------------------
+(define gDocs-4 ((login gDocs-3 "user1" "pass1" create)
+                 (crear-fecha 28 10 2021) "Documento 0" "Primer contenido del Documento 0 "))
+(define gDocs-5 ((login gDocs-4 "user1" "pass1" create)
+                 (crear-fecha 28 10 2021) "Documento 1" "Primer contenido del Documento 1 "))
+(define gDocs-6 ((login gDocs-5 "user2" "pass2" create)
+                 (crear-fecha 29 10 2021) "Documento 2" "Primer contenido del Documento 2 "))
+(define gDocs-7 ((login gDocs-6 "user3" "pass3" create)
+                 (crear-fecha 29 10 2021) "Documento 3" "Primer contenido del Documento 3 "))
+(define gDocs-8 ((login gDocs-7 "user5" "pass5" create)
+                 (crear-fecha 30 10 2021) "Documento 4" "Primer contenido del Documento 4 "))
 
-; EJEMPLOS login-share:
+; EJEMPLOS DE LA FUNCIÓN LOGIN-SHARE
 
-(define emptyGDocs5 ((login emptyGDocs4 "Jaime" "pinturaceresita" share) 0 "Angel" "R"))
+(define gDocs-9 ((login gDocs-8 "user1" "pass1" share)
+                 1 (access "user4" #\r)))
+(define gDocs-10 ((login gDocs-9 "user2" "pass2" share)
+                  2 (access "user5" #\c)))
+(define gDocs-11 ((login gDocs-10 "user3" "pass3" share)
+                  3 (access "user1" #\w) (access "user2" #\w) (access "user4" #\r)))
+(define gDocs-12 ((login gDocs-11 "user5" "pass5" share)
+                  4 (access "user4" #\w) (access "user1" #\w) (access "user2" #\r) (access "user3" #\c)))
 
-; EJEMPLOS SCRIPT ---------------------------------------------------------------------------------------------------------------------------------
-(define gDocs5 ((login gDocs4 "user1" "pass1" share) 1 (access "user2" #\r)))
-(define gDocs6 ((login gDocs5 "user2" "pass2" share) 0 (access "user1" #\r) (access "user2" #\w)))
-(define gDocs7 ((login gDocs6 "user3" "pass3" share) 0 (access "user1" #\c)))
-; -------------------------------------------------------------------------------------------------------------------------------------------------
+; EJEMPLOS DE LA FUNCIÓN LOGIN-ADD
 
+(define gDocs-13 ((login gDocs-12 "user1" "pass1" add)
+                  0 (crear-fecha 01 11 2021) "Segundo contenido del Documento 0 "))
+(define gDocs-14 ((login gDocs-13 "user2" "pass2" add)
+                  2 (crear-fecha 01 11 2021) "Segundo contenido del Documento 2 "))
+(define gDocs-15 ((login gDocs-14 "user3" "pass3" add)
+                  3 (crear-fecha 01 11 2021) "Segundo contenido del Documento 3 "))
+(define gDocs-16 ((login gDocs-15 "user1" "pass1" add)
+                  0 (crear-fecha 02 11 2021) "Tercer contenido del Documento 0 "))
+(define gDocs-17 ((login gDocs-16 "user2" "pass2" add)
+                  2 (crear-fecha 02 11 2021) "Tercer contenido del Documento 2 "))
+(define gDocs-18 ((login gDocs-17 "user1" "pass1" add)
+                  0 (crear-fecha 02 11 2021) "Cuarto contenido del Documento 0 "))
+(define gDocs-19 ((login gDocs-18 "user4" "pass4" add)
+                  4 (crear-fecha 02 11 2021) "Segundo contenido del Documento 4 "))
 
+; EJEMPLOS DE LA FUNCIÓN LOGIN-RESTOREVERSION
 
-|#
+(define gDocs-20 ((login gDocs-19 "user3" "pass3" restoreVersion)
+                  3 0))
+(define gDocs-21 ((login gDocs-20 "user1" "pass1" restoreVersion)
+                  0 2))
+(define gDocs-22 ((login gDocs-21 "user3" "pass3" restoreVersion)
+                  3 0))
 
+; EJEMPLOS DE LA FUNCIÓN LOGIN-REVOKEALLACCESSES
 
-(define gDocs0 (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
+(define gDocs-23 (login gDocs-22 "user2" "pass2" revokeAllAccesses))
+(define gDocs-24 (login gDocs-23 "user3" "pass3" revokeAllAccesses))
+(define gDocs-25 (login gDocs-24 "user5" "passerronea" revokeAllAccesses))
 
-(define gDocs1 (register (register (register gDocs0 (crear-fecha 25 10 2021) "user1" "pass1") (crear-fecha 25 10 2021) "user2"
-"pass2") (crear-fecha 25 10 2021) "user3" "pass3"))
+; EJEMPLOS DE LA FUNCIÓN LOGIN-SEARCH
 
-(define gDocs2 ((login gDocs1 "user1" "pass1" create) (crear-fecha 30 08 2021) "doc0" "contenido doc0"))
-(define gDocs3 ((login gDocs2 "user1" "pass1" create) (crear-fecha 30 08 2021) "doc1" "contenido doc1"))
-(define gDocs4 ((login gDocs3 "user2" "pass2" create) (crear-fecha 30 08 2021) "doc2" "contenido doc2"))
-(define gDocs5 ((login gDocs4 "user3" "pass3" create) (crear-fecha 30 08 2021) "doc3" "contenido doc3"))
+;((login gDocs-25 "user1" "pass1" search) "contenido")
+;((login gDocs-25 "user1" "pass1" search) "Cuarto")
+;((login gDocs-25 "user5" "pass5" search) "Doc")
 
-(define gDocs6 ((login gDocs5 "user1" "pass1" share) 1 (access "user2" #\r)))
-(define gDocs7 ((login gDocs6 "user3" "pass3" share) 3 (access "user1" #\c)))
-(define gDocs8 ((login gDocs7 "user2" "pass2" share) 2 (access "user1" #\r) (access "user3" #\w)))
+; EJEMPLOS DE LA FUNCIÓN LOGIN-PARADIGMADOCS->STRING
 
-(define gDocs9 ((login gDocs8 "user1" "pass1" add) 0 (crear-fecha 30 11 2021) "mas contenido en doc0"))
-(define gDocs10 ((login gDocs9 "user3" "pass3" add) 3 (crear-fecha 30 11 2021) "mas contenido en doc3"))
-(define gDocs11 ((login gDocs10 "user3" "pass3" add) 0 (crear-fecha 30 11 2021) "mas contenido en doc3"));situación no valida (permisos)
-(define gDocs12 ((login gDocs11 "user3" "pass3" add) 3 (crear-fecha 30 11 2021) "avena con agua"))
+;(login gDocs-25 "user2" "pass2" paradigmadocs->string)
+;(login gDocs-25 "user1" "pass1" paradigmadocs->string)
+;(login gDocs-25 "user4" "pass4" paradigmadocs->string)
 
-(define gDocs13 ((login gDocs12 "user3" "pass3" restoreVersion) 3 0))
-(define gDocs14 ((login gDocs13 "user1" "pass1" restoreVersion) 0 0))
-(define gDocs15 ((login gDocs14 "user3" "pass3" restoreVersion) 3 1))
+; EJEMPLOS DE LA FUNCIÓN PARADIGMADOCS->STRING
 
-(define gDocs16 (login gDocs15 "user2" "pass2" revokeAllAccesses))
-
-;((login gDocs16 "user1" "pass1" search) "contenido")
-
-
-
+;(paradigmadocs->string gDocs-25)
+;(paradigmadocs->string gDocs-12)
+;(paradigmadocs->string gDocs-1)

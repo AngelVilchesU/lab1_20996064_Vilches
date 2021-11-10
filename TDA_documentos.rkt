@@ -140,6 +140,18 @@
     )
   )
 
+
+
+; Descripción:
+; Dominio:
+; Recorrido:
+
+(define get-fecha-list-version
+  (lambda (lista-version)
+    (car (cdr lista-version))
+    )
+  )
+
 ; Descripción:
 ; Dominio:
 ; Recorrido:
@@ -602,7 +614,81 @@
     )
   )
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;USAR MAP ACÁ
+
+(define documento->string
+  (lambda (usuario)
+    (lambda (documento)
+      (if (null? documento)
+          ""
+          (if (or (buscar-usuario-propietario documento usuario) (buscar-usuario-compartido (get-dato-doc documento 5) usuario))
+              (string-append "-> ID del Documento: " (number->string (get-dato-doc documento 0)) "\n"
+                             "Propietario: " (get-dato-doc documento 1) "\n"
+                             "Fecha de creación: " (fecha->string (get-dato-doc documento 2)) "\n"
+                             "Nombre del documento: " (get-dato-doc documento 3) "\n"
+                             (string-join (versiones->string (get-dato-doc documento 4)))
+                             (string-join (compartidos->string (get-dato-doc documento 5))))
+                
+              "")
+          )
+      )))
+
+; Descripción:
+; Dominio:
+; Recorrido:
+
+(define versiones->string
+  (lambda (lista-base-versiones)
+    (if (null? lista-base-versiones)
+        null
+        (cons (string-append "Nro. versión: " (number->string (get-version-doc (get-primera-lista lista-base-versiones))) "\n"
+                             "Fecha de creación: " (fecha->string (get-fecha-list-version (get-primera-lista lista-base-versiones))) "\n"
+                             "Contenido: " (encryptFn (get-contenido (get-primera-lista lista-base-versiones))) "\n")
+            (versiones->string (cdr lista-base-versiones)))
+            )
+        )
+    )
+
+; Descripción:
+; Dominio:
+; Recorrido:
+
+(define compartidos->string
+  (lambda (lista-base-compartidos)
+    (if (null? lista-base-compartidos)
+        null
+        (cons (string-append "Usuario compartido: " (get-usuario-compartido (get-primera-lista lista-base-compartidos)) "\n"
+                             "Acceso concedido: " (string (get-acceso-compartido (get-primera-lista lista-base-compartidos))) "\n")
+            (compartidos->string (cdr lista-base-compartidos)))
+        )
+    )
+  )
+
+(define propietario-compartido
+  (lambda (usuario)
+    (lambda (documento)
+      (if (or (buscar-usuario-propietario documento usuario) (buscar-usuario-compartido (get-dato-doc documento 5) usuario))
+          documento
+          null)
+      )
+    )
+  )
+
+(define documentos->string
+    (lambda (lista-documentos)
+      (if (null? lista-documentos)
+          null
+          (cons (string-append "-> ID del Documento: " (number->string (get-dato-doc (get-primera-lista lista-documentos) 0)) "\n"
+                               "Propietario: " (get-dato-doc (get-primera-lista lista-documentos) 1) "\n"
+                               "Fecha de creación: " (fecha->string (get-dato-doc (get-primera-lista lista-documentos) 2)) "\n"
+                               "Nombre del documento: " (get-dato-doc (get-primera-lista lista-documentos) 3) "\n"
+                               (string-join (versiones->string (get-dato-doc (get-primera-lista lista-documentos) 4)))
+                               (string-join (compartidos->string (get-dato-doc (get-primera-lista lista-documentos) 5))))
+                (documentos->string (cdr lista-documentos)))
+          )
+      ))
 
 
 

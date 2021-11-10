@@ -95,6 +95,13 @@
     )
   )
 
+(define get-fecha-list-usuario
+  (lambda (lista-info-usuario)
+    (car lista-info-usuario)
+        
+    ))
+
+
 ; Modificador:
 ; Descripción: Función que permite modificar el usuario registrado mediante...
 ;              ...la creación de una nueva lista conservando los datos que no sean el usuario
@@ -275,6 +282,44 @@
             (buscar-usuario-activo (cdr lista-base))
             )
         )
+    )
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Descripción:
+; Dominio:
+; Recorrido:
+
+(define usuario->string
+  (lambda (lista-base-usuarios usuario)
+    (if (null? lista-base-usuarios)
+        #f
+        (if (equal? usuario (get-usuario (car lista-base-usuarios)))
+            (string-append "Nombre de usuario: " usuario "\n" "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
+            (if (null? (cdr lista-base-usuarios))
+                #f
+                (usuario->string (cdr lista-base-usuarios) usuario))
+            )
+        )
+    )
+  )
+
+(define usuarios->string
+  (lambda (lista-base-usuarios)
+    (if (null? lista-base-usuarios)
+        null
+        (cons (string-append "Nombre de usuario: " (get-usuario (car lista-base-usuarios)) "\n"
+                             "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
+              (usuarios->string (cdr lista-base-usuarios)))
+        )     
+    )
+  )
+
+
+(define fecha->string
+  (lambda (fecha)
+    (string-append (number->string (get-dia fecha)) "-" (number->string (get-mes fecha)) "-" (number->string (get-año fecha)))
     )
   )
 
