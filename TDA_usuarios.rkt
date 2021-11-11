@@ -285,18 +285,18 @@
     )
   )
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que convierte y une la información de un usuario especifíco (Nombre y fecha de creación del usuario) a string
+; Dominio: Lista de usuarios X usuario
+; Recorrido: String
+; Tipo de recursión: Recursión natural/lineal
 
 (define usuario->string
   (lambda (lista-base-usuarios usuario)
     (if (null? lista-base-usuarios)
         #f
         (if (equal? usuario (get-usuario (car lista-base-usuarios)))
-            (string-append "Nombre de usuario: " usuario "\n" "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
+            (string-append "Nombre de usuario: " usuario "\n"
+                           "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
             (if (null? (cdr lista-base-usuarios))
                 #f
                 (usuario->string (cdr lista-base-usuarios) usuario))
@@ -305,6 +305,12 @@
     )
   )
 
+; Descripción: Función que convierte y une la información todos los usuarios (Nombres y fechas de creación de los usuarios) a string en una lista...
+;              ... (aplicar "string-join" al resultado para expresar el string)
+; Dominio: Lista de usuarios
+; Recorrido: lista
+; Tipo de recursión: Recursión natural/lineal
+
 (define usuarios->string
   (lambda (lista-base-usuarios)
     (if (null? lista-base-usuarios)
@@ -312,17 +318,9 @@
         (cons (string-append "Nombre de usuario: " (get-usuario (car lista-base-usuarios)) "\n"
                              "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
               (usuarios->string (cdr lista-base-usuarios)))
-        )     
+        )
     )
   )
-
-
-(define fecha->string
-  (lambda (fecha)
-    (string-append (number->string (get-dia fecha)) "-" (number->string (get-mes fecha)) "-" (number->string (get-año fecha)))
-    )
-  )
-
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
@@ -397,6 +395,20 @@
 (define ejemplo-buscar-usuario-activo-1 (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)))
 (define ejemplo-buscar-usuario-activo-2 (buscar-usuario-activo (get-dato ejemplo-agregar-y-remover-2 4)))
 (define ejemplo-buscar-usuario-activo-3 (buscar-usuario-activo (get-dato ejemplo-agregar-y-remover-3 4)))
+
+(define ejemplo-usuario->string-1 (usuario->string (get-dato ejemplo-agregar-y-remover-2 4) "Jaime"))
+(define ejemplo-usuario->string-2 (usuario->string (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-1 4) "Angel"))
+(define ejemplo-usuario->string-3 (usuario->string (list (list (list 19 10 2021) "user1" "pass1" 0)
+                                                         (list (list 20 10 2021) "user2" "pass2" 0)
+                                                         (list (list 21 10 2021) "user3" "pass3" 0)
+                                                         (list (list 22 10 2021) "user4" "pass4" 0))
+                                                   "user3"))
+(define ejemplo-usuarios->string-1 (usuarios->string (get-dato ejemplo-agregar-y-remover-2 4)))
+(define ejemplo-usuarios->string-2 (usuarios->string (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-1 4)))
+(define ejemplo-usuarios->string-3 (usuarios->string (list (list (list 19 10 2021) "user1" "pass1" 0)
+                                                         (list (list 20 10 2021) "user2" "pass2" 0)
+                                                         (list (list 21 10 2021) "user3" "pass3" 0)
+                                                         (list (list 22 10 2021) "user4" "pass4" 0))))
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

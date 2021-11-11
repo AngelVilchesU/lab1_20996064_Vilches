@@ -616,7 +616,10 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;USAR MAP ACÁ
+; Descripción: Función que permite convertir un documento a un string considerando como condicional un usuario el cual debe figurar como propietario y/o usuario...
+;              ... compartido
+; Dominio (currificado): usuario X documento
+; Recorrido: string
 
 (define documento->string
   (lambda (usuario)
@@ -633,11 +636,15 @@
                 
               "")
           )
-      )))
+      )
+    )
+  )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite convertir la información de un documento (versiones, fechas y contenidos de este) a string contenido en una lista...
+;              ... (aplicar "string-join" al resultado para expresar el string)
+; Dominio: lista de versiones
+; Recorrido: lista
+; Tipo de recursión: Recursión natural/lineal
 
 (define versiones->string
   (lambda (lista-base-versiones)
@@ -993,9 +1000,23 @@
 (define ejemplo-buscar-usuario-propietario-2 (buscar-usuario-propietario ejemplo-crear-documento-1 "Cale"))
 (define ejemplo-buscar-usuario-propietario-3 (buscar-usuario-propietario ejemplo-crear-documento-1 "A"))
 
+(define ejemplo-documento->string-1 ((documento->string "user1") (list 4 "user1" (list 30 12 2021) "gDocs" (list (list 0 (list 30 12 2021) "CONTENIDO")) (list ))))
+(define ejemplo-documento->string-2 ((documento->string "Angel") ejemplo-crear-documento-1))
+(define ejemplo-documento->string-3 ((documento->string "Jaime") ejemplo-crear-documento-2))
 
-
-
+(define ejemplo-versiones->string-1 (versiones->string (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                             (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                             )))
+(define ejemplo-versiones->string-2 (versiones->string (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                                           (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                                           (list 2 (list 25 10 2021) (encryptFn "TERCERA VERSIÓN"))
+                                                                           (list 3 (list 25 10 2021) (encryptFn "CUARTA VERSIÓN"))
+                                                                           )))
+(define ejemplo-versiones->string-3 (versiones->string (list (list 0 (list 25 10 2021) (encryptFn "PRIMERA VERSIÓN"))
+                                                                           (list 1 (list 25 10 2021) (encryptFn "SEGUNDA VERSIÓN"))
+                                                                           (list 2 (list 25 10 2021) (encryptFn "TERCERA VERSIÓN"))
+                                                                           (list 3 (list 25 10 2021) (encryptFn "CUARTA VERSIÓN"))
+                                                                           (list 4 (list 25 10 2021) (encryptFn "QUINTA Y ÚLTIMA VERSIÓN")))))
 
 
 

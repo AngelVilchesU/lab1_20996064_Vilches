@@ -151,8 +151,18 @@
       )
   )
 
+; Descripción: Función que convierte una fecha (DD:MM:AA) como una lista de números enteros a un string
+; Dominio: Lista correspondiente a la fecha
+; Recorrido: String
 
-;------------------------------------------------------------------------------------------------------
+(define fecha->string
+  (lambda (fecha)
+    (string-append (number->string (get-dia fecha)) "-" (number->string (get-mes fecha)) "-" (number->string (get-año fecha)))
+    )
+  )
+
+
+;---------------------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
 (define ejemplo-crear-fecha-1 (crear-fecha 18 10 2021))
 (define ejemplo-crear-fecha-2 (crear-fecha 22 11 2021))
@@ -206,7 +216,11 @@
 (define ejemplo-dias-del-mes-1 (dias-del-mes 2 2021))
 (define ejemplo-dias-del-mes-2 (dias-del-mes 2 2024))
 (define ejemplo-dias-del-mes-3 (dias-del-mes 12 2030))
-;------------------------------------------------------------------------------------------------------
+
+(define ejemplo-fecha->string-1 (fecha->string ejemplo-crear-fecha-1))
+(define ejemplo-fecha->string-2 (fecha->string ejemplo-crear-fecha-2))
+(define ejemplo-fecha->string-3 (fecha->string (crear-fecha 15 02 2022)))
+;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 (provide (all-defined-out))
