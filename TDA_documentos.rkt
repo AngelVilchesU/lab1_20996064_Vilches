@@ -93,11 +93,11 @@
 ; Recorrido: lista
 ; Tipo de recursión: Recursión natural/lineal
 
-(define ultima-version
+(define get-ultima-version
   (lambda (lista-versiones)
     (if (null? (cdr lista-versiones))
         (car lista-versiones)
-        (ultima-version (cdr lista-versiones)) 
+        (get-ultima-version (cdr lista-versiones)) 
         )
     )
   )
@@ -109,20 +109,20 @@
 ; Importante: La presente función se ejecuta de forma conjunta con la función "n-version" definida más adelante en el espectro de...
 ;             ... de "Otras funciones"
 
-(define n-version-lista
+(define get-n-version-lista
   (lambda (lista-versiones version)
     (if (equal? (car (car lista-versiones)) version)
             (car lista-versiones)
             (if (null? (cdr lista-versiones))
                 #f      
-                (n-version-lista (cdr lista-versiones) version))
+                (get-n-version-lista (cdr lista-versiones) version))
         )
     )
   )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite obtener el usuario en una lista de usuario compartido perteneciente a una lista contenedora de las mismas
+; Dominio: lista
+; Recorrido: string
 
 (define get-usuario-compartido
   (lambda (lista-usuarios-compartido)
@@ -130,9 +130,9 @@
     )
   )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite obtener el acceso en una lista de usuario compartido perteneciente a una lista contenedora de las mismas
+; Dominio: lista
+; Recorrido: char
 
 (define get-acceso-compartido
   (lambda (lista-usuarios-compartido)
@@ -140,11 +140,9 @@
     )
   )
 
-
-
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite obtener la fecha en una lista de versión perteneciente a una lista contenedora de las mismas
+; Dominio: lista
+; Recorrido: fecha
 
 (define get-fecha-list-version
   (lambda (lista-version)
@@ -152,24 +150,25 @@
     )
   )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite obtener el contenido en una lista de versión perteneciente a una lista contenedora de las mismas
+; Dominio: lista
+; Recorrido: string
 
 (define get-contenido
   (lambda (lista-version)
-    (car (cdr (cdr lista-version))
+    (car (cdr (cdr lista-version)))
     )
-  ))
+  )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite obtener la primera lista de una lista de listas (enfocado en recursión)
+; Dominio: lista de listas
+; Recorrido: primera lista
 
 (define get-primera-lista
   (lambda (lista-de-listas)
-    (car lista-de-listas))
+    (car lista-de-listas)
     )
+  )
   
 
 
@@ -257,7 +256,7 @@
                                                                           (list (ID-version-doc (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4) -1)
                                                                                 fecha
                                                                                 (encryptFn
-                                                                                 (string-append (encryptFn (get-dato-doc (ultima-version (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)) 2))
+                                                                                 (string-append (encryptFn (get-dato-doc (get-ultima-version (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)) 2))
                                                                                                 contenido)))))
                                                                  (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 5))))
             ; ¿El resto de la lista de listas del TDA-documentos es nula?
@@ -289,10 +288,10 @@
                                                                  (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 1)
                                                                  (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 2)
                                                                  (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 3)
-                                                                 (reverse (correlativo (remove-n-version-lista
+                                                                 (reverse (correlativo (remove-get-n-version-lista
                                                                                         (append (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)
                                                                                                 (list
-                                                                                                 (set-version-doc (n-version-lista
+                                                                                                 (set-version-doc (get-n-version-lista
                                                                                                                    (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)
                                                                                                                    id-version)
                                                                                                                   (ID-version-doc
@@ -395,7 +394,7 @@
 ; Dominio: id X usuario-acceso X paradigmadocs
 ; Recorrido: actualización de paradigmadocs
 
-(define agregar-y-remover-compartido
+(define set-n-remov-compartido
   (lambda (id-doc usuario-acceso paradigmadocs)
     (remov-lista-repet (get-dato (agregar-usuario-compartido (get-dato paradigmadocs 5) id-doc usuario-acceso paradigmadocs) 5)
                        id-doc
@@ -414,25 +413,6 @@
     (remov-lista-repet (get-dato (agregar-version-doc (get-dato paradigmadocs 5) id-doc fecha contenido paradigmadocs) 5)
                        id-doc
                        (agregar-version-doc (get-dato paradigmadocs 5) id-doc fecha contenido paradigmadocs))
-    )
-  )
-
-; Descripción: Función que permite veríficar la existencia de la enésima versión de un documento contenido en una lista de listas
-; Dominio: lista de versiones X versión
-; Recorrido: Booleano
-; Tipo de recursión: Recursión natural/lineal
-
-(define n-version
-  (lambda (lista-versiones version)
-    ; ¿La primera lista contenida en la lista de listas posee una versión equivalente a la solicitada?
-    (if (equal? (car (get-version-doc lista-versiones)) version)
-            #t
-            ; ¿El resto de las listas de lista es nulo?
-            (if (null? (cdr lista-versiones))
-                #f
-                ; Llamado recursivo retornando la función, el resto de listas y la versión a buscar
-                (n-version (cdr lista-versiones) version))
-        )
     )
   )
 
@@ -462,7 +442,7 @@
 ; Recorrido: lista de versiones actualizada
 ; Tipo de recursión: recursión natural/lineal
 
-(define remove-n-version-lista
+(define remove-get-n-version-lista
   (lambda (lista-versiones version)
     ; ¿La primera lista contenida en la lista de listas posee en su primer elemento el usuario solicitado?
     (if (equal? (get-version-doc (car lista-versiones)) version)
@@ -471,7 +451,7 @@
         (if (null? (cdr lista-versiones))
             #f
             ; Llamado recursivo contatenando la lista que no corresponde a la buscada (para no perderla) y el llamado con el resto de listas y la versión buscada
-            (cons (car lista-versiones) (remove-n-version-lista (cdr lista-versiones) version))
+            (cons (car lista-versiones) (remove-get-n-version-lista (cdr lista-versiones) version))
             )
         )
     )
@@ -542,7 +522,9 @@
     )
   )
 
-
+; Descripción: Función que permite identificar si un cualquiera ingresado string forma parte de del contenido/string ubicado en un documento 
+; Dominio: string X lista
+; Recorrido: Booleano
 
 (define verificador-de-substring
   (lambda (frase lista-versiones)
@@ -558,6 +540,11 @@
     )
   )
 
+; Descripción: Función que llama a la función "verificador-de-substring" ya definida recibiendo sus entradas de forma currificada e insertandolas...
+;              ... a la función aluda de forma "lineal"
+; Dominio: string X lista
+; Recorrido: procedure
+
 (define llamado-verificador-de-substring
   (lambda (frase)
     (lambda (documento)
@@ -566,24 +553,28 @@
     )
   )
 
-(define llamado-valido?
+; Descripción: Función que permite identificar si un usuario es propietario o figura como usuario compartido en determinado documento
+; Dominio: string X lista
+; Recorrido: Booleano
+
+(define valido?
   (lambda (usuario)
     (lambda (documento)
-      (valido? usuario documento)
+      (if (null? documento)
+          #f
+          (if (or (buscar-usuario-compartido (get-dato-doc documento 5) usuario) (buscar-usuario-propietario documento usuario) )
+              #t
+              #f)
+          )
       )
     )
   )
 
-(define valido?
-  (lambda (usuario documento)
-    (if (null? documento)
-        #f
-        (if (or (buscar-usuario-compartido (get-dato-doc documento 5) usuario) (buscar-usuario-propietario documento usuario) )
-            #t
-            #f
-    )
-  )))
-
+; Descripción: Función que permite a verificar recursivamente si un usuario determinado se encuentra en la lista de listas contenedoras de usuarios...
+;              ... compartidos con un acceso válido
+; Dominio: Lista X string
+; Recorrido: Booleano
+; Tipo de recursión: Recursión natural
 
 (define buscar-usuario-compartido
   (lambda (lista-base usuario)
@@ -601,6 +592,10 @@
     )
   )
 
+; Descripción: Función que permite a verificar si un usuario determinado figura en un documento como propietario
+; Dominio: Lista X string
+; Recorrido: Booleano
+
 (define buscar-usuario-propietario
   (lambda (documento usuario)
     ; ¿La lista de listas es nula?
@@ -613,8 +608,6 @@
         )
     )
   )
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Descripción: Función que permite convertir un documento a un string considerando como condicional un usuario el cual debe figurar como propietario y/o usuario...
 ;              ... compartido
@@ -658,9 +651,11 @@
         )
     )
 
-; Descripción:
-; Dominio:
-; Recorrido:
+; Descripción: Función que permite convertir la información de un documento (usuarios compartidos y sus accesos) a string contenido en una lista...
+;              ... (aplicar "string-join" al resultado para expresar el string)
+; Dominio: lista de usuarios compartidos
+; Recorrido: lista
+; Tipo de recursión: Recursión natural/lineal
 
 (define compartidos->string
   (lambda (lista-base-compartidos)
@@ -673,7 +668,11 @@
     )
   )
 
-(define propietario-compartido
+; Descripción: Función que retorna el documento en caso de que en este el usuario ingresado figure como propietario y/o usuario compartido
+; Dominio: string X lista
+; Recorrido: list
+
+(define filtrador-propietario-compartido
   (lambda (usuario)
     (lambda (documento)
       (if (or (buscar-usuario-propietario documento usuario) (buscar-usuario-compartido (get-dato-doc documento 5) usuario))
@@ -682,6 +681,12 @@
       )
     )
   )
+
+; Descripción: Función que permite convertir todos los documentos a string contenido en una lista valiendose de las funciones definidas anteriormente...
+;              ... (aplicar "string-join" al resultado para expresar el string)
+; Dominio: lista de documentos
+; Recorrido: lista de string
+; Tipo de recursión: Recursión natural
 
 (define documentos->string
     (lambda (lista-documentos)
@@ -695,7 +700,8 @@
                                (string-join (compartidos->string (get-dato-doc (get-primera-lista lista-documentos) 5))))
                 (documentos->string (cdr lista-documentos)))
           )
-      ))
+      )
+  )
 
 
 
@@ -706,21 +712,21 @@
 ;EJEMPLOS CONSTRUCTOR:
 ; Las siguientes funciones son necesarias para la correcta ejecución de los ejemplos. Asimismo, las funciones comentadas se encuentran definidas y exportadas...
 ; ... desde los TDA_usuarios y TDA_paradigmadocs.
-; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))"
-; ...adicionalmente: (define ejemplo-crear-usuario-1 (crear-usuario (crear-fecha 19 10 2021) "Angel" "contraseña"))
-; ...adicionalmente: (define ejemplo-crear-usuario-2 (crear-usuario (crear-fecha 20 10 2021) "Jaime" "pinturaceresita"))
+; ...previamente definida la plataforma a emplear: "(define emptyGDocs (paradigmadocs "gDocs" (date 16 10 2021) encryptFn encryptFn))"
+; ...adicionalmente: (define ejemplo-crear-usuario-1 (crear-usuario (date 19 10 2021) "Angel" "contraseña"))
+; ...adicionalmente: (define ejemplo-crear-usuario-2 (crear-usuario (date 20 10 2021) "Jaime" "pinturaceresita"))
 ; ...adicionalmente: (define ejemplo-set-act-list-usuarios-paradigmadocs-2 (set-act-list-usuarios-paradigmadocs emptyGDocs ejemplo-crear-usuario-2))
 ; ...adicionalmente: (define ejemplo-set-act-list-usuarios-paradigmadocs-3 (set-act-list-usuarios-paradigmadocs ejemplo-set-act-list-usuarios-paradigmadocs-2 ejemplo-crear-usuario-1))
 ; ...adicionalmente:
-(define plataforma (agregar-y-remover "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
+(define plataforma (set-n-remov "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
 ; lo anterior es basicamente register (con el usuario "Angel" logeado)
 
 (define ejemplo-crear-documento-1 (crear-documento
-                                   (crear-fecha 25 10 2021) "Gdocs" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) -1) "PRIMER TEXTO" 0))
+                                   (date 25 10 2021) "Gdocs" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) -1) "PRIMER TEXTO" 0))
 (define ejemplo-crear-documento-2 (crear-documento
-                                 (crear-fecha 30 12 2021) "DOC" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) 0) "INFORME" 0))
+                                 (date 30 12 2021) "DOC" (buscar-usuario-activo (get-dato plataforma 4)) (ID-version-doc (get-dato plataforma 5) 0) "INFORME" 0))
 (define ejemplo-crear-documento-3 (crear-documento
-                                (crear-fecha 4 5 2025) "TXT" (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)) (ID-version-doc (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 5) 0) "BORRADOR" 0))
+                                (date 4 5 2025) "TXT" (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)) (ID-version-doc (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 5) 0) "BORRADOR" 0))
 ; El tercer ejemplo expresa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:
@@ -737,30 +743,30 @@
 (define ejemplo-get-version-doc-2 (get-version-doc (get-primera-lista (get-dato-doc ejemplo-crear-documento-2 4))))
 (define ejemplo-get-version-doc-3 (get-version-doc (list 7 (list 25 10 2021) "EJEMPLO DE ARGUMENTO IDEAL")))
 
-(define ejemplo-ultima-version-1 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-get-ultima-version-1 (get-ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA Y ÚLTIMA VERSIÓN"))))
-(define ejemplo-ultima-version-2 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-get-ultima-version-2 (get-ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
                                                        (list 2 (list 25 10 2021) "TERCERA Y ÚLTIMA VERSIÓN"))))
-(define ejemplo-ultima-version-3 (ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-ultima-version-3 (get-ultima-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
                                                        (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
                                                        (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
                                                        (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))))
 
-(define ejemplo-n-version-lista-1 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-get-n-version-lista-1 (get-n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
                                                        (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
                                                        (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
                                                        (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
                                                    0))
-(define ejemplo-n-version-lista-2 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-get-n-version-lista-2 (get-n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
                                                        (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
                                                        (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
                                                        (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
                                                    2))
-(define ejemplo-n-version-lista-3 (n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
+(define ejemplo-get-n-version-lista-3 (get-n-version-lista (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
                                                        (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
                                                        (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
                                                        (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
@@ -861,32 +867,14 @@
 ; EJEMPLO remov-lista-repet
 ; EJEMPLO remov-lista-repet
 
-; EJEMPLO agregar-y-remover-compartido
-; EJEMPLO agregar-y-remover-compartido
-; EJEMPLO agregar-y-remover-compartido
+; EJEMPLO set-n-remov-compartido
+; EJEMPLO set-n-remov-compartido
+; EJEMPLO set-n-remov-compartido
 
 ; EJEMPLO agregar-remover-doc
 ; EJEMPLO agregar-remover-doc
 ; EJEMPLO agregar-remover-doc
 
-(define ejemplo-n-version-1 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
-                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
-                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
-                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
-                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
-                                       1))
-(define ejemplo-n-version-2 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
-                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
-                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
-                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
-                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
-                                       2))
-(define ejemplo-n-version-3 (n-version (list (list 0 (list 25 10 2021) "PRIMERA VERSIÓN")
-                                                       (list 1 (list 25 10 2021) "SEGUNDA VERSIÓN")
-                                                       (list 2 (list 25 10 2021) "TERCERA VERSIÓN")
-                                                       (list 3 (list 25 10 2021) "CUARTA VERSIÓN")
-                                                       (list 4 (list 25 10 2021) "QUINTA Y ÚLTIMA VERSIÓN"))
-                                       5))
 
 (define ejemplo-buscar-usuario-editor-1 (buscar-usuario-editor (list (list "USUARIO" #\r)
                                                              (list "USUARIO2" #\w)
@@ -904,9 +892,9 @@
                                                              (list "USUARIO4" #\w))
                                                                "USUARIO4"))
 
-; EJEMPLO remove-n-version-lista
-; EJEMPLO remove-n-version-lista
-; EJEMPLO remove-n-version-lista
+; EJEMPLO remove-get-n-version-lista
+; EJEMPLO remove-get-n-version-lista
+; EJEMPLO remove-get-n-version-lista
 
 ; EJEMPLO agregar-remover-version
 ; EJEMPLO agregar-remover-version
@@ -971,7 +959,7 @@
 (define ejemplo-llamado-verificador-de-substring-1 ((llamado-verificador-de-substring "PRIMERA") ejemplo-crear-documento-1))
 (define ejemplo-llamado-verificador-de-substring-2 ((llamado-verificador-de-substring "IRP") ejemplo-crear-documento-1)) ;RECORDAR EXISTENCIA DE ENCRYPTFN
 (define ejemplo-llamado-verificador-de-substring-3 ((llamado-verificador-de-substring "XET") ejemplo-crear-documento-1)) ;RECORDAR EXISTENCIA DE ENCRYPTFN
-
+#|
 (define ejemplo-llamado-valido?-1 ((llamado-valido? "ANGEL") ejemplo-crear-documento-1))
 (define ejemplo-llamado-valido?-2 ((llamado-valido? "Angel") ejemplo-crear-documento-1))
 (define ejemplo-llamado-valido?-3 ((llamado-valido? "USER") ejemplo-crear-documento-1))
@@ -979,7 +967,7 @@
 (define ejemplo-valido?-1 (valido? "ANGEL" ejemplo-crear-documento-1))
 (define ejemplo-valido?-2 (valido? "Angel" ejemplo-crear-documento-1))
 (define ejemplo-valido?-3 (valido? "USER" ejemplo-crear-documento-1))
-
+|#
 (define ejemplo-buscar-usuario-compartido-1 (buscar-usuario-compartido (list (list "USUARIO" #\r)
                                                                              (list "USUARIO2" #\w)
                                                                              (list "USUARIO3" #\c)

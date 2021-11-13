@@ -130,9 +130,9 @@
 
 ;--------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
-(define ejemplo-paradigmadocs (paradigmadocs "gDocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
-(define ejemplo-paradigmadocs-2 (paradigmadocs "gWord" (crear-fecha 17 10 2021) encryptFn encryptFn))
-(define ejemplo-paradigmadocs-3 (paradigmadocs "gTXT" (crear-fecha 18 13 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs (paradigmadocs "gDocs" (date 16 10 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs-2 (paradigmadocs "gWord" (date 17 10 2021) encryptFn encryptFn))
+(define ejemplo-paradigmadocs-3 (paradigmadocs "gTXT" (date 18 13 2021) encryptFn encryptFn))
 ; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:

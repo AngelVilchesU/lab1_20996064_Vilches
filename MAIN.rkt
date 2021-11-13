@@ -8,65 +8,82 @@
 ; Implementación de los requisitos funcionales
 
 ; Descripción: Función que permite el registro de un usuario a la plataforma creada mediante la solicitud de el nombre de...
-;              ... el nombre de la plataforma, nombre de usuario, contraseña y fecha.
+;              ... de la plataforma, fecha, nombre de usuario y contraseña.
 ; Dominio: paradigmadocs X date X string X string
 ; Recorrido: Actualización de paradigmadocs
-; Tipo de recursión: Recursión natural la cual contempla en el caso base la nula existencia de parametros para...
-;                    ... insertar lo ingresado, caso contrario se llama a si misma dejando estados pendientes...
-;                    ... considerando el "resto" de la lista cada vez. No sin antes obtenener la lista ubicada...
-;                    ... en la sexta posición de paradigmadocs donde se ubica la información de usuarios
+; Tipo de recursión: Recursión natural (empleada en la función "esta-usuario?") la cual contempla como caso base la nula existencia...
+;                    ... de listas de usuarios contenidas en una lista general de las mismas para luego considerar los condicionales,...
+;                    ... en caso de que el caso base sea falso, los cuales establecen una comparación entre los usuarios de la lista...
+;                    ... a evaluar, retornando el valor booleano "#t" en caso de que el usuario se encuentre y como caso contrario...
+;                    ... un último condicional evaluando la nula existencia de el resto de las listas ya aludidas. De forma que, si...
+;                    ... no quedan más lista se retorna el valor booleano "#f" (no se encuentra) y en caso que aún no se hayan evaluado...
+;                    ... todas las listas retornar el caso recursivo considerando el nombre de la función ("esta-usuario?") y sus entradas...
+;                    ... como el resto de la lista ("cdr") y el usuario a comparar.
 
 (define register
   (lambda (paradigmadocs fecha usuario contraseña)
-    (if (equal? (esta-usuario? (get-dato paradigmadocs 4) usuario) #f)   
+    ; ¿El nombre de usuario a registrar se encuentra ya registrado?
+    (if (equal? (esta-usuario? (get-dato paradigmadocs 4) usuario) #f)
+        ; Caso en donde el usuario no se encuentra registrado: Se registra
         (set-act-list-usuarios-paradigmadocs paradigmadocs
                                              (crear-usuario
                                               fecha
                                               usuario
                                               contraseña))
+        ; Caso en donde el usuario se encuentra registrado: No se registra
         paradigmadocs)
     )
   )
        
-; Descripción: Función que permite autenticar un usuario y de ello la ejecución de comandos definido en la plataforma...
+; Descripción: Función que permite autenticar un usuario (activar usuario) y de ello la ejecución de comandos definido en la plataforma...
 ;              ... dependiendo de la correcta validación del usuario
 ; Dominio: paradigmadocs X string X string X function
-; Recorrido: función (parcial) y paradigmadocs actualizado (final)
+; Recorrido: función (parcialmente evaluada)
+; Funciones de orden superior empleadas en el llamado de las operaciones ingresadas
+; Tipo de recursión: Recursión natural (empleada en la función "usuario-contraseña-valida?") la cual considera como caso base la nula...
+;                    ... existencia de listas contenedoras de usuarios en una lista general de las mismas para evaluar dos condicionales...
+;                    ... en donde el primero compara el usuario y contraseña ingresado con los existentes en la lista para, en caso de...
+;                    ... ser verdaderos se retorna el valor booleano "#t" y caso contrario el segundo condicional evaluando la nula...
+;                    ... existencia del resto de listas en la lista general para finalmente, en caso de ser falso se realiza el llamado...
+;                    ... recursivo considerando como parámetros, el resto de la lista, usuario y contraseña.
 
 (define login
   (lambda (paradigmadocs usuario contraseña operacion)
-    (if (and (equal? (esta-usuario? (get-dato paradigmadocs 4) usuario) #t ) (equal? (esta-contraseña? (get-dato paradigmadocs 4) contraseña) #t ))
-        (if (procedure? operacion)
-            (if (equal? operacion create)
-                (create (agregar-y-remover usuario paradigmadocs))
-                (if (equal? operacion share)
-                    (share (agregar-y-remover usuario paradigmadocs))
-                    (if (equal? operacion add)
-                        (add (agregar-y-remover usuario paradigmadocs))
-                        (if (equal? operacion restoreVersion)
-                            (restoreVersion (agregar-y-remover usuario paradigmadocs))
-                            (if (equal? operacion revokeAllAccesses)
-                                (revokeAllAccesses (agregar-y-remover usuario paradigmadocs))
-                                (if (equal? operacion search)
-                                    (search (agregar-y-remover usuario paradigmadocs))
-                                    (if (equal? operacion paradigmadocs->string)
-                                        (paradigmadocs->string (agregar-y-remover usuario paradigmadocs))
-                                        #f)
-                                    )
+    ; ¿El usuario existe y su correspondiente contraseña es válida para el mismo?
+    (if (usuario-contraseña-valida? (get-dato paradigmadocs 4) usuario contraseña)
+        ; Caso verdadero: Se procede a evalúar si la operación ingresada es un procedimiento/función y con ello su retorno parcialmente evaluado (si es un proceso)
+        ; Es importante comentar que una vez ubicada la operación, esta es llamada otorgando (junto con lo necesario para el funcionamiento de la función) la...
+        ; ... plataforma con el usuario activo/logeado (función "set-n-remov")
+        (if (equal? operacion create)
+            (create (set-n-remov usuario paradigmadocs))
+            (if (equal? operacion share)
+                (share (set-n-remov usuario paradigmadocs))
+                (if (equal? operacion add)
+                    (add (set-n-remov usuario paradigmadocs))
+                    (if (equal? operacion restoreVersion)
+                        (restoreVersion (set-n-remov usuario paradigmadocs))
+                        (if (equal? operacion revokeAllAccesses)
+                            (revokeAllAccesses (set-n-remov usuario paradigmadocs))
+                            (if (equal? operacion search)
+                                (search (set-n-remov usuario paradigmadocs))
+                                (if (equal? operacion paradigmadocs->string)
+                                    (paradigmadocs->string (set-n-remov usuario paradigmadocs))
+                                    paradigmadocs)
                                 )
                             )
                         )
                     )
                 )
-            paradigmadocs)
-        paradigmadocs)      
+            )
+        ; Caso falso: Se procede a retornar la operación según lo expresado en el documento del proyecto
+        (operacion paradigmadocs))
     )
   )
-  
 
 ; Descripción: Función que permite a un usuario con sesión iniciada en la plataforma definida crear un documento de texto de modo que en este...
-;              ... se registre al autor, fecha de creación, nombre del documento y su contenido retornando una versión actualizada de acuerdo...
-;              ... a los parámetros ingresados en paralelo con la eliminación de la sesión activa del usuario/creador correspondiente
+;              ... se registre al autor, fecha de creación, nombre del documento y su contenido (como string) retornando una versión actualizada...
+;              ... de la plataforma empleada de acuerdo a los parámetros ingresados en paralelo con la eliminación de la sesión activa del...
+;              ... usuario/creador correspondiente
 ; Dominio: paradigmadocs X (date) X nombre-documento X contenido
 ; Recorrido: Actualización de paradigmadocs
 
@@ -74,21 +91,21 @@
   (lambda (paradigmadocs)
     (lambda (fecha nombre-documento contenido)
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-          (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4))
-                             (list (get-dato paradigmadocs 0)
-                                   (get-dato paradigmadocs 1)
-                                   (get-dato paradigmadocs 2)
-                                   (get-dato paradigmadocs 3)
-                                   (get-dato paradigmadocs 4)
-                                   (anexar-listas (get-dato paradigmadocs 5)
-                                                  (crear-documento
-                                                   fecha
-                                                   nombre-documento
-                                                   (buscar-usuario-activo (get-dato paradigmadocs 4))
-                                                   (ID-version-doc (get-dato paradigmadocs 5) -1)
-                                                   ((get-dato paradigmadocs 2) contenido)
-                                                   0))))
-          create)
+          (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                       (list (get-dato paradigmadocs 0)
+                             (get-dato paradigmadocs 1)
+                             (get-dato paradigmadocs 2)
+                             (get-dato paradigmadocs 3)
+                             (get-dato paradigmadocs 4)
+                             (anexar-listas (get-dato paradigmadocs 5)
+                                            (crear-documento
+                                             fecha
+                                             nombre-documento
+                                             (buscar-usuario-activo (get-dato paradigmadocs 4))
+                                             (ID-version-doc (get-dato paradigmadocs 5) -1)
+                                             ((get-dato paradigmadocs 2) contenido)
+                                             0))))
+          paradigmadocs)
       )
     )
   )
@@ -105,8 +122,8 @@
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
           (if (buscar-Id-documento (get-dato paradigmadocs 5) idDocs)
               (if (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDocs))))
-                  (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4))
-                                     (agregar-y-remover-compartido idDocs (apply list access usuario-acceso) paradigmadocs))
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                                     (set-n-remov-compartido idDocs (apply list access usuario-acceso) paradigmadocs))
                   #f)
               #f)
           share)
@@ -127,10 +144,10 @@
           (if (buscar-Id-documento (get-dato paradigmadocs 5) idDocs)
               (if (or (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDocs))))
                       (buscar-usuario-editor (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) idDocs) 5) (buscar-usuario-activo (get-dato paradigmadocs 4))))
-                  (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4))
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
                                      (agregar-remover-doc idDocs fecha contenido paradigmadocs))
-                  (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
-              (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
+              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
           add)
       )
     )
@@ -149,12 +166,12 @@
               ; condicional: si el usuario ingresado es el propietario del documento
               (if (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDoc))))
                   ; condicional: si la versión del documento existe
-                  (if (n-version (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) idDoc) 4) idVersion)
-                      (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4))
+                  (if (get-n-version-lista (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) idDoc) 4) idVersion)
+                      (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
                                          (agregar-remover-version idDoc idVersion paradigmadocs))
-                      (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
-                  (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
-              (agregar-y-remover (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
+                      (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
+              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
           restoreVersion)
       )
     )
@@ -165,7 +182,7 @@
   (lambda (paradigmadocs)
     ; condicional: si existe un usuario activo
     (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-        (agregar-y-remover (buscar-usuario-activo
+        (set-n-remov (buscar-usuario-activo
                             (get-dato paradigmadocs 4))
                             (set-act-list-doc-paradigmadocs paradigmadocs
                                                             (concatenador (get-dato paradigmadocs 5)
@@ -183,7 +200,7 @@
     (lambda (frase)
       ; condicional: si existe un usuario activo
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-          (filter (llamado-valido? (buscar-usuario-activo (get-dato paradigmadocs 4))) (filter (llamado-verificador-de-substring frase) (get-dato paradigmadocs 5)))
+          (filter (valido? (buscar-usuario-activo (get-dato paradigmadocs 4))) (filter (llamado-verificador-de-substring frase) (get-dato paradigmadocs 5)))
           null)
       )
     )
@@ -196,7 +213,7 @@
     (if (buscar-usuario-activo (get-dato paradigmadocs 4))
         (string-append (usuario->string (get-dato paradigmadocs 4) (buscar-usuario-activo (get-dato paradigmadocs 4)))
                        (string-join (map (documento->string (buscar-usuario-activo (get-dato paradigmadocs 4)))
-                                         (map (propietario-compartido (buscar-usuario-activo (get-dato paradigmadocs 4))) (get-dato paradigmadocs 5)))))
+                                         (map (filtrador-propietario-compartido (buscar-usuario-activo (get-dato paradigmadocs 4))) (get-dato paradigmadocs 5)))))
         (string-append "Nombre plataforma: " (get-dato paradigmadocs 0) "\n"
                        "Fecha creación: " (fecha->string (get-dato paradigmadocs 1)) "\n"
                        (string-join (usuarios->string (get-dato paradigmadocs 4)))
@@ -215,7 +232,7 @@
 
 ; CREACIÓN DE LA PLATAFORMA PARADIGMADOCS
 
-(define gDocs-0 (paradigmadocs "Paradigmadocs" (crear-fecha 16 10 2021) encryptFn encryptFn))
+(define gDocs-0 (paradigmadocs "Paradigmadocs" (date 16 10 2021) encryptFn encryptFn))
 
 ; EJEMPLOS DE LA FUNCIÓN REGISTER
 
@@ -223,26 +240,26 @@
                  (register
                   (register
                    gDocs-0
-                   (crear-fecha 25 10 2021) "user1" "pass1")
-                  (crear-fecha 25 10 2021) "user2" "pass2")
-                 (crear-fecha 25 10 2021) "user3" "pass3"))
+                   (date 25 10 2021) "user1" "pass1")
+                  (date 25 10 2021) "user2" "pass2")
+                 (date 25 10 2021) "user3" "pass3"))
 (define gDocs-2 (register
-                 gDocs-1 (crear-fecha 26 10 2021) "user4" "pass4"))
+                 gDocs-1 (date 26 10 2021) "user4" "pass4"))
 (define gDocs-3 (register
-                 gDocs-2 (crear-fecha 27 10 2021) "user5" "pass5"))
+                 gDocs-2 (date 27 10 2021) "user5" "pass5"))
 
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-CREATE
 
 (define gDocs-4 ((login gDocs-3 "user1" "pass1" create)
-                 (crear-fecha 28 10 2021) "Documento 0" "Primer contenido del Documento 0 "))
+                 (date 28 10 2021) "Documento 0" "Primer contenido del Documento 0 "))
 (define gDocs-5 ((login gDocs-4 "user1" "pass1" create)
-                 (crear-fecha 28 10 2021) "Documento 1" "Primer contenido del Documento 1 "))
+                 (date 28 10 2021) "Documento 1" "Primer contenido del Documento 1 "))
 (define gDocs-6 ((login gDocs-5 "user2" "pass2" create)
-                 (crear-fecha 29 10 2021) "Documento 2" "Primer contenido del Documento 2 "))
+                 (date 29 10 2021) "Documento 2" "Primer contenido del Documento 2 "))
 (define gDocs-7 ((login gDocs-6 "user3" "pass3" create)
-                 (crear-fecha 29 10 2021) "Documento 3" "Primer contenido del Documento 3 "))
+                 (date 29 10 2021) "Documento 3" "Primer contenido del Documento 3 "))
 (define gDocs-8 ((login gDocs-7 "user5" "pass5" create)
-                 (crear-fecha 30 10 2021) "Documento 4" "Primer contenido del Documento 4 "))
+                 (date 30 10 2021) "Documento 4" "Primer contenido del Documento 4 "))
 
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-SHARE
 
@@ -258,19 +275,19 @@
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-ADD
 
 (define gDocs-13 ((login gDocs-12 "user1" "pass1" add)
-                  0 (crear-fecha 01 11 2021) "Segundo contenido del Documento 0 "))
+                  0 (date 01 11 2021) "Segundo contenido del Documento 0 "))
 (define gDocs-14 ((login gDocs-13 "user2" "pass2" add)
-                  2 (crear-fecha 01 11 2021) "Segundo contenido del Documento 2 "))
+                  2 (date 01 11 2021) "Segundo contenido del Documento 2 "))
 (define gDocs-15 ((login gDocs-14 "user3" "pass3" add)
-                  3 (crear-fecha 01 11 2021) "Segundo contenido del Documento 3 "))
+                  3 (date 01 11 2021) "Segundo contenido del Documento 3 "))
 (define gDocs-16 ((login gDocs-15 "user1" "pass1" add)
-                  0 (crear-fecha 02 11 2021) "Tercer contenido del Documento 0 "))
+                  0 (date 02 11 2021) "Tercer contenido del Documento 0 "))
 (define gDocs-17 ((login gDocs-16 "user2" "pass2" add)
-                  2 (crear-fecha 02 11 2021) "Tercer contenido del Documento 2 "))
+                  2 (date 02 11 2021) "Tercer contenido del Documento 2 "))
 (define gDocs-18 ((login gDocs-17 "user1" "pass1" add)
-                  0 (crear-fecha 02 11 2021) "Cuarto contenido del Documento 0 "))
+                  0 (date 02 11 2021) "Cuarto contenido del Documento 0 "))
 (define gDocs-19 ((login gDocs-18 "user4" "pass4" add)
-                  4 (crear-fecha 02 11 2021) "Segundo contenido del Documento 4 "))
+                  4 (date 02 11 2021) "Segundo contenido del Documento 4 "))
 
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-RESTOREVERSION
 
@@ -289,18 +306,18 @@
 
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-SEARCH
 
-;((login gDocs-25 "user1" "pass1" search) "contenido")
-;((login gDocs-25 "user1" "pass1" search) "Cuarto")
-;((login gDocs-25 "user5" "pass5" search) "Doc")
+;((login gDocs-24 "user1" "pass1" search) "contenido")
+;((login gDocs-24 "user1" "pass1" search) "Cuarto")
+;((login gDocs-24 "user5" "pass5" search) "Doc")
 
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-PARADIGMADOCS->STRING
 
-;(login gDocs-25 "user2" "pass2" paradigmadocs->string)
-;(login gDocs-25 "user1" "pass1" paradigmadocs->string)
-;(login gDocs-25 "user4" "pass4" paradigmadocs->string)
+;(login gDocs-24 "user2" "pass2" paradigmadocs->string)
+;(login gDocs-24 "user1" "pass1" paradigmadocs->string)
+;(login gDocs-24 "user4" "pass4" paradigmadocs->string)
 
 ; EJEMPLOS DE LA FUNCIÓN PARADIGMADOCS->STRING
 
-;(paradigmadocs->string gDocs-25)
+;(paradigmadocs->string gDocs-24)
 ;(paradigmadocs->string gDocs-12)
 ;(paradigmadocs->string gDocs-1)

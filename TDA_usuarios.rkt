@@ -95,40 +95,7 @@
     )
   )
 
-(define get-fecha-list-usuario
-  (lambda (lista-info-usuario)
-    (car lista-info-usuario)
-        
-    ))
-
-
 ; Modificador:
-; Descripción: Función que permite modificar el usuario registrado mediante...
-;              ...la creación de una nueva lista conservando los datos que no sean el usuario
-; Dominio: Lista de información del usuario
-; Recorrido: Lista correspondiente a la información del usuario modificada (usuario)
-
-(define set-usuario
-  (lambda (lista-info-usuario nuevo-usuario)
-    (if (usuario? (list (get-fecha lista-info-usuario) nuevo-usuario (get-contraseña lista-info-usuario)))
-        (list (get-fecha lista-info-usuario) nuevo-usuario (get-contraseña lista-info-usuario) (get-act-ina-sesión lista-info-usuario))
-        #f)
-    )
-  )
-
-; Descripción: Función que permite modificar la contraseña registrada mediante...
-;              ...la creación de una nueva lista conservando los datos que no sean la contraseña
-; Dominio: Lista de información del usuario
-; Recorrido: Lista correspondiente a la información del usuario modificada (contraseña)
-
-(define set-contraseña
-  (lambda (lista-info-usuario nueva-contraseña)
-    (if (usuario? (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) nueva-contraseña))
-        (list (get-fecha lista-info-usuario) (get-usuario lista-info-usuario) nueva-contraseña (get-act-ina-sesión lista-info-usuario))
-        #f)
-    )
-  )
-
 ; Descripción: Función que permite modificar el valor booleano asignado de acuerdo con las operaciones...
 ;              ...que se realicen (activar)
 ; Dominio: Lista de información del usuario X usuario X paradigmadocs
@@ -233,7 +200,7 @@
 ; Dominio: usuario X paradigmadocs
 ; Recorrido: Actualización de paradigmadocs
 
-(define agregar-y-remover
+(define set-n-remov
   (lambda (usuario paradigmadocs)
     (remover-list-usuario-act-ina (get-dato (set-act-ina-usuario (get-dato paradigmadocs 4) usuario paradigmadocs) 4)
                                   usuario
@@ -246,23 +213,24 @@
 ; Recorrido: Booleano
 ; Tipo de recursión: Recursión natural/lineal
 
-(define esta-contraseña?
-  (lambda (lista-info-usuarios contraseña)
+(define usuario-contraseña-valida?
+  (lambda (lista-info-usuarios usuario contraseña)
     ; ¿La lista contenedora de listas de usuarios es nula?
     (if (null? lista-info-usuarios)
         #f
         ; ¿La contraseña en la primera lista de usuarios contenida coincide con la ingresada?
-        (if (equal? contraseña (get-contraseña (car lista-info-usuarios)))
+        (if (and (equal? usuario (get-usuario (car lista-info-usuarios))) (equal? contraseña (get-contraseña (car lista-info-usuarios))))
             #t
             ; ¿El resto de listas de usuario es nulo?
             (if (null? (cdr lista-info-usuarios))
                 #f
                 ; Llamado recursivo entregando el resto de listas de usuario en la lista "base" y la contraseña
-                (esta-contraseña? (cdr lista-info-usuarios) contraseña))
+                (usuario-contraseña-valida? (cdr lista-info-usuarios) usuario contraseña))
             )
         )
     )
   )
+  
 
 ; Descripción: Función que busca, mediante recursión natural/lineal, un usuario cuyo parámetro indicador de autentificador en su correspondiente lista de información...
 ;              ... refleje que este se encuentre activo (1)
@@ -296,7 +264,7 @@
         #f
         (if (equal? usuario (get-usuario (car lista-base-usuarios)))
             (string-append "Nombre de usuario: " usuario "\n"
-                           "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
+                           "Fecha de creación: " (fecha->string (get-fecha (car lista-base-usuarios))) "\n")
             (if (null? (cdr lista-base-usuarios))
                 #f
                 (usuario->string (cdr lista-base-usuarios) usuario))
@@ -316,7 +284,7 @@
     (if (null? lista-base-usuarios)
         null
         (cons (string-append "Nombre de usuario: " (get-usuario (car lista-base-usuarios)) "\n"
-                             "Fecha de creación: " (fecha->string (get-fecha-list-usuario (car lista-base-usuarios))) "\n")
+                             "Fecha de creación: " (fecha->string (get-fecha (car lista-base-usuarios))) "\n")
               (usuarios->string (cdr lista-base-usuarios)))
         )
     )
@@ -324,9 +292,9 @@
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
-(define ejemplo-crear-usuario-1 (crear-usuario (crear-fecha 19 10 2021) "Angel" "contraseña"))
-(define ejemplo-crear-usuario-2 (crear-usuario (crear-fecha 20 10 2021) "Jaime" "pinturaceresita"))
-(define ejemplo-crear-usuario-3 (crear-usuario (crear-fecha 19 12 2021) "Fifi" 6))
+(define ejemplo-crear-usuario-1 (crear-usuario (date 19 10 2021) "Angel" "contraseña"))
+(define ejemplo-crear-usuario-2 (crear-usuario (date 20 10 2021) "Jaime" "pinturaceresita"))
+(define ejemplo-crear-usuario-3 (crear-usuario (date 19 12 2021) "Fifi" 6))
 ; El tercer ejemplo expresa una situación no valida
 
 ;EJEMPLOS PERTENENCIA:
@@ -384,26 +352,26 @@
 ;; ELIMINA USUARIO ACTIVO "Angel"
 (define ejemplo-remover-list-usuario-act-ina-3 (remover-list-usuario-act-ina (get-dato ejemplo-set-act-ina-usuario-3 4) "Angel" ejemplo-set-act-ina-usuario-3))
 
-(define ejemplo-agregar-y-remover-1 (agregar-y-remover "Jaime" ejemplo-set-act-list-usuarios-paradigmadocs-3))
-(define ejemplo-agregar-y-remover-2 (agregar-y-remover "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
-(define ejemplo-agregar-y-remover-3 (agregar-y-remover "Angel" ejemplo-agregar-y-remover-2))
+(define ejemplo-set-n-remov-1 (set-n-remov "Jaime" ejemplo-set-act-list-usuarios-paradigmadocs-3))
+(define ejemplo-set-n-remov-2 (set-n-remov "Angel" ejemplo-set-act-list-usuarios-paradigmadocs-3))
+(define ejemplo-set-n-remov-3 (set-n-remov "Angel" ejemplo-set-n-remov-2))
 
-(define ejemplo-esta-contraseña?-1 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "pinturaceresita"))
-(define ejemplo-esta-contraseña?-2 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "contraseña"))
-(define ejemplo-esta-contraseña?-3 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "imaginar usar esta FN igualando usuario y contraseña UwU"))
+;(define ejemplo-esta-contraseña?-1 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "pinturaceresita"))
+;(define ejemplo-esta-contraseña?-2 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "contraseña"))
+;(define ejemplo-esta-contraseña?-3 (esta-contraseña? (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4) "imaginar usar esta FN igualando usuario y contraseña UwU"))
 
 (define ejemplo-buscar-usuario-activo-1 (buscar-usuario-activo (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-3 4)))
-(define ejemplo-buscar-usuario-activo-2 (buscar-usuario-activo (get-dato ejemplo-agregar-y-remover-2 4)))
-(define ejemplo-buscar-usuario-activo-3 (buscar-usuario-activo (get-dato ejemplo-agregar-y-remover-3 4)))
+(define ejemplo-buscar-usuario-activo-2 (buscar-usuario-activo (get-dato ejemplo-set-n-remov-2 4)))
+(define ejemplo-buscar-usuario-activo-3 (buscar-usuario-activo (get-dato ejemplo-set-n-remov-3 4)))
 
-(define ejemplo-usuario->string-1 (usuario->string (get-dato ejemplo-agregar-y-remover-2 4) "Jaime"))
+(define ejemplo-usuario->string-1 (usuario->string (get-dato ejemplo-set-n-remov-2 4) "Jaime"))
 (define ejemplo-usuario->string-2 (usuario->string (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-1 4) "Angel"))
 (define ejemplo-usuario->string-3 (usuario->string (list (list (list 19 10 2021) "user1" "pass1" 0)
                                                          (list (list 20 10 2021) "user2" "pass2" 0)
                                                          (list (list 21 10 2021) "user3" "pass3" 0)
                                                          (list (list 22 10 2021) "user4" "pass4" 0))
                                                    "user3"))
-(define ejemplo-usuarios->string-1 (usuarios->string (get-dato ejemplo-agregar-y-remover-2 4)))
+(define ejemplo-usuarios->string-1 (usuarios->string (get-dato ejemplo-set-n-remov-2 4)))
 (define ejemplo-usuarios->string-2 (usuarios->string (get-dato ejemplo-set-act-list-usuarios-paradigmadocs-1 4)))
 (define ejemplo-usuarios->string-3 (usuarios->string (list (list (list 19 10 2021) "user1" "pass1" 0)
                                                          (list (list 20 10 2021) "user2" "pass2" 0)

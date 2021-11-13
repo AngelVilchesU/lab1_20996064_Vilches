@@ -11,7 +11,7 @@
 ; Dominio: integer X integer X integer
 ; Recorrido: Lista correspondiente a la fecha
 
-(define crear-fecha
+(define date
   (lambda (dia mes año)
     (if (fecha? (list dia mes año))
         (list dia mes año)
@@ -82,44 +82,7 @@
   )
 
 ; Modificadores:
-; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
-;              ... cambiando el dato correspondiente, en este caso, el día
-; Dominio: Lista correspondiente a la fecha a modificar y el día a registrar
-; Recorrido: Lista correspondiente a la fecha ya modificada (dia)
-
-(define set-dia
-  (lambda (fecha nuevo-dia)
-    (if (fecha? (list nuevo-dia (get-mes fecha) (get-año fecha)))
-        (list nuevo-dia (get-mes fecha) (get-año fecha))
-              #f)
-    )
-  )
-
-; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
-;              ... cambiando el dato correspondiente, en este caso, el mes
-; Dominio: Lista correspondiente a la fecha a modificar y el mes a registrar
-; Recorrido: Lista correspondiente a la fecha ya modificada (mes)
-
-(define set-mes
-  (lambda (fecha nuevo-mes)
-    (if (fecha? (list (get-dia fecha) nuevo-mes (get-año fecha)))
-        (list (get-dia fecha) nuevo-mes (get-año fecha))
-              #f)
-    )
-  )
-
-; Descripción: Función que permite la modificación de una fecha mediante la creación de un fecha nueva...
-;              ... cambiando el dato correspondiente, en este caso, el año
-; Dominio: Lista correspondiente a la fecha a modificar y el año a registrar
-; Recorrido: Lista correspondiente a la fecha ya modificada (año)
-
-(define set-año
-  (lambda (fecha nuevo-año)
-    (if (fecha? (list (get-dia fecha) (get-mes fecha) nuevo-año))
-        (list (get-dia fecha) (get-mes fecha) nuevo-año)
-              #f)
-    )
-  )
+; N/A
 
 ; Otras funciones:
 
@@ -164,49 +127,36 @@
 
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------
 ;EJEMPLOS CONSTRUCTOR:
-(define ejemplo-crear-fecha-1 (crear-fecha 18 10 2021))
-(define ejemplo-crear-fecha-2 (crear-fecha 22 11 2021))
-(define ejemplo-crear-fecha-3 (crear-fecha 29 2 2021))
+(define ejemplo-date-1 (date 18 10 2021))
+(define ejemplo-date-2 (date 22 11 2021))
+(define ejemplo-date-3 (date 29 2 2021))
 ; El tercer ejemplo representa una situación no valida. Es importante comentar que el programa no seguirá...
 ; ... ejecutando funciones sobre una situación no valida, sin embargo, para ejemplificar se ejecutarán
 
 ;EJEMPLOS PERTENENCIA:
-(define ejemplo-fecha?-1 (fecha? ejemplo-crear-fecha-1))
-(define ejemplo-fecha?-2 (fecha? ejemplo-crear-fecha-2))
-(define ejemplo-fecha?-3 (fecha? ejemplo-crear-fecha-3))
+(define ejemplo-fecha?-1 (fecha? ejemplo-date-1))
+(define ejemplo-fecha?-2 (fecha? ejemplo-date-2))
+(define ejemplo-fecha?-3 (fecha? ejemplo-date-3))
 ; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS SELECTORES:
-(define ejemplo-get-dia-1 (get-dia ejemplo-crear-fecha-1))
-(define ejemplo-get-dia-2 (get-dia ejemplo-crear-fecha-2))
-(define ejemplo-get-dia-3 (get-dia ejemplo-crear-fecha-3))
+(define ejemplo-get-dia-1 (get-dia ejemplo-date-1))
+(define ejemplo-get-dia-2 (get-dia ejemplo-date-2))
+(define ejemplo-get-dia-3 (get-dia ejemplo-date-3))
 ; El tercer ejemplo representa una situación no valida
 
-(define ejemplo-get-mes-1 (get-mes ejemplo-crear-fecha-1))
-(define ejemplo-get-mes-2 (get-mes ejemplo-crear-fecha-2))
-(define ejemplo-get-mes-3 (get-mes ejemplo-crear-fecha-3))
+(define ejemplo-get-mes-1 (get-mes ejemplo-date-1))
+(define ejemplo-get-mes-2 (get-mes ejemplo-date-2))
+(define ejemplo-get-mes-3 (get-mes ejemplo-date-3))
 ; El tercer ejemplo representa una situación no valida
 
-(define ejemplo-get-año-1 (get-año ejemplo-crear-fecha-1))
-(define ejemplo-get-año-2 (get-año ejemplo-crear-fecha-2))
-(define ejemplo-get-año-3 (get-año ejemplo-crear-fecha-3))
+(define ejemplo-get-año-1 (get-año ejemplo-date-1))
+(define ejemplo-get-año-2 (get-año ejemplo-date-2))
+(define ejemplo-get-año-3 (get-año ejemplo-date-3))
 ; El tercer ejemplo representa una situación no valida
 
 ;EJEMPLOS MODIFICADORES:
-(define ejemplo-set-dia-1 (set-dia ejemplo-crear-fecha-1 20))
-(define ejemplo-set-dia-2 (set-dia ejemplo-crear-fecha-2 30))
-(define ejemplo-set-dia-3 (set-dia ejemplo-crear-fecha-3 0))
-; El tercer ejemplo expresa una situación no valida
-
-(define ejemplo-set-mes-1 (set-mes ejemplo-crear-fecha-1 2))
-(define ejemplo-set-mes-2 (set-mes ejemplo-crear-fecha-2 12))
-(define ejemplo-set-mes-3 (set-mes ejemplo-crear-fecha-3 13))
-; El tercer ejemplo representa una situación no valida
-
-(define ejemplo-set-año-1 (set-año ejemplo-crear-fecha-1 2022))
-(define ejemplo-set-año-2 (set-año ejemplo-crear-fecha-2 2024))
-(define ejemplo-set-año-3 (set-año ejemplo-crear-fecha-3 2020))
-; El tercer ejemplo representa una situación no valida
+; N/A
 
 ;EJEMPLOS OTRAS FUNCIONES:
 (define ejemplo-bisiesto?-1 (bisiesto? 2021))
@@ -217,9 +167,9 @@
 (define ejemplo-dias-del-mes-2 (dias-del-mes 2 2024))
 (define ejemplo-dias-del-mes-3 (dias-del-mes 12 2030))
 
-(define ejemplo-fecha->string-1 (fecha->string ejemplo-crear-fecha-1))
-(define ejemplo-fecha->string-2 (fecha->string ejemplo-crear-fecha-2))
-(define ejemplo-fecha->string-3 (fecha->string (crear-fecha 15 02 2022)))
+(define ejemplo-fecha->string-1 (fecha->string ejemplo-date-1))
+(define ejemplo-fecha->string-2 (fecha->string ejemplo-date-2))
+(define ejemplo-fecha->string-3 (fecha->string (date 15 02 2022)))
 ;---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
