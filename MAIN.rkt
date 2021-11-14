@@ -84,13 +84,17 @@
 ;              ... se registre al autor, fecha de creación, nombre del documento y su contenido (como string) retornando una versión actualizada...
 ;              ... de la plataforma empleada de acuerdo a los parámetros ingresados en paralelo con la eliminación de la sesión activa del...
 ;              ... usuario/creador correspondiente
-; Dominio: paradigmadocs X (date) X nombre-documento X contenido
+; Dominio: paradigmadocs X date X nombre-documento X contenido
 ; Recorrido: Actualización de paradigmadocs
 
 (define create
   (lambda (paradigmadocs)
     (lambda (fecha nombre-documento contenido)
+      ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+          ; Caso verdadero: Mediante getters y setters se crea un documento de acuerdo con la información ingresada (consultar TDA_documentos para la representación)...
+          ;                 ... luego se remueve la sesión activa del usuario autenticado retornando la plataforma modificada. Es importante comentar que el contenido...
+          ;                 ... (string) ingresado es encriptado en la plataforma
           (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
                        (list (get-dato paradigmadocs 0)
                              (get-dato paradigmadocs 1)
@@ -105,6 +109,7 @@
                                              (ID-version-doc (get-dato paradigmadocs 5) -1)
                                              ((get-dato paradigmadocs 2) contenido)
                                              0))))
+          ; Caso falso: No se realiza ninguna operación/cambio sobre la plataforma según lo explicitado en el documento del proyecto
           paradigmadocs)
       )
     )
@@ -119,14 +124,24 @@
 (define share
   (lambda (paradigmadocs)
     (lambda (idDocs access . usuario-acceso)
+      ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+          ; Caso verdadero: Se procede a buscar el documento mediante su identificador único y, si el usuario autenticado corresponde al autor del documento...
+          ;                 ... mediente getters y setters es modificada la plataforma (inserción de usuario compartido con su respectivo acceso) considerando...
+          ;                 ... la eliminación de la sesión activa del usuario
           (if (buscar-Id-documento (get-dato paradigmadocs 5) idDocs)
-              (if (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDocs))))
+              (if (buscar-usuario-propietario (buscar-Id-documento (get-dato paradigmadocs 5) idDocs) (buscar-usuario-activo (get-dato paradigmadocs 4)))
+                  ; Si el usuario figura como el propietario del documento...
                   (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
-                                     (set-n-remov-compartido idDocs (apply list access usuario-acceso) paradigmadocs))
-                  #f)
-              #f)
-          share)
+                               (set-n-remov-compartido idDocs (apply list access usuario-acceso) paradigmadocs))
+                  ; Si el usuario no figura como el propietario del documento...
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                               paradigmadocs)) ;retorna la plataforma previo a la operación
+              ; Si el documento no existe...
+              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                               paradigmadocs)) ;retorna la plataforma previo a la operación
+          ; Caso falso: No se realiza ninguna operación/cambio sobre la plataforma según lo explicitado en el documento del proyecto
+          paradigmadocs)
       )
     )
   )
@@ -140,96 +155,146 @@
 (define add
   (lambda (paradigmadocs)
     (lambda (idDocs fecha contenido)
+      ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+          ; Caso verdadero: Se procede a buscar el documento mediante su identificador único y, si el usuario autenticado corresponde al autor del documento o...
+          ;                 ... este posee permisos de escritura sobre el mismo, mediante getters y setters se registra el cambio en el documento reflejado como...
+          ;                 ... una nueva versión del mismo (consultar TDA_documentos para la representación) removiendo la sesión activa del usuario
+          ; Es importante comentar que el contenido (string) ingresado es encriptado en la plataforma
           (if (buscar-Id-documento (get-dato paradigmadocs 5) idDocs)
-              (if (or (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDocs))))
+              (if (or (buscar-usuario-propietario (buscar-Id-documento (get-dato paradigmadocs 5) idDocs) (buscar-usuario-activo (get-dato paradigmadocs 4)))
                       (buscar-usuario-editor (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) idDocs) 5) (buscar-usuario-activo (get-dato paradigmadocs 4))))
+                  ; Si el usuario es propietario o editor del documento...
                   (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
-                                     (agregar-remover-doc idDocs fecha contenido paradigmadocs))
-                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
-              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs)) ;retorna la plataforma previo a la operación
-          add)
+                               (agregar-remover-doc idDocs fecha contenido paradigmadocs))
+                  ; Si el usuario no es propietario o editor del documento...
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                               paradigmadocs)) ;retorna la plataforma previo a la operación
+              ; Si el documento no existe...
+              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                           paradigmadocs)) ;retorna la plataforma previo a la operación
+          ; Caso falso: No se realiza ninguna operación/cambio sobre la plataforma según lo explicitado en el documento del proyecto
+          paradigmadocs)
       )
     )
   )
 
-
-
+; Descripción: Función que permite restaurar una versión anterior de un documento de modo que la versión a restaurar se fije como la versión actual y la activa...
+;              ... figure como una versión más en el historial de las mismas. Para ello, solo el propietario del documento puede realizar esta operación en paralelo...
+;              ... con su correcta identificación mediante el login retornando una versión modificada de la plataforma junto con la eliminación de la sesión activa...
+;              ... del usuario
+; Dominio: paradigmadocs X integer X integer
+; Recorrido: Actualización de paradigmadocs
 
 (define restoreVersion
   (lambda (paradigmadocs)
     (lambda (idDoc idVersion)
-      ; condicional: si existe un usuario activo
+      ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-          ; condicional: si el documento existe
+          ; Caso verdadero: Se procede a buscar el documento mediante su identificador único junto con la verificación que refleje que el usuario autenticado...
+          ;                 ... corresponde al autor del documento y la existencia de la versión indicada para luego mediante getters y setters aplicar el cambio...
+          ;                 ... agregando una lista de versión a la lista general nueva con el cambio, removiendo la anterior y actualizando el valor de las versiones...
+          ;                 ... o identificador de cada lista en paralelo con la eliminación del usuario activo
           (if (buscar-Id-documento (get-dato paradigmadocs 5) idDoc)
-              ; condicional: si el usuario ingresado es el propietario del documento
-              (if (equal? (buscar-usuario-activo (get-dato paradigmadocs 4)) (car (cdr (buscar-Id-documento (get-dato paradigmadocs 5) idDoc))))
-                  ; condicional: si la versión del documento existe
+              (if (buscar-usuario-propietario (buscar-Id-documento (get-dato paradigmadocs 5) idDoc) (buscar-usuario-activo (get-dato paradigmadocs 4)))
                   (if (get-n-version-lista (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) idDoc) 4) idVersion)
                       (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
-                                         (agregar-remover-version idDoc idVersion paradigmadocs))
-                      (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
-                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
-              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4)) paradigmadocs))
-          restoreVersion)
+                                   (agregar-remover-version idDoc idVersion paradigmadocs))
+                      ; Si la versión del documento no existe...
+                      (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                                   paradigmadocs)) ;retorna la plataforma previo a la operación
+                  ; Si el usuario autenticado no figura como propietario del documento...
+                  (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                               paradigmadocs)) ;retorna la plataforma previo a la operación
+              ; Si el documento no existe...
+              (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                           paradigmadocs)) ;retorna la plataforma previo a la operación
+          ; Caso falso: No se realiza ninguna operación/cambio sobre la plataforma según lo explicitado en el documento del proyecto
+          paradigmadocs) 
       )
     )
   )
 
+; Descripción: Función que permite al propietario/autor de un documento revocar todos los accesos a sus documentos implementando la función...
+;              ... de forma declarativa aplicando la función "map" y retornando la plataforma modificada con la eliminación del usuario activo
+; Dominio: paradigmadocs
+; Recorrido: Actualización de paradigmadocs
 
 (define revokeAllAccesses
   (lambda (paradigmadocs)
-    ; condicional: si existe un usuario activo
+    ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
     (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-        (set-n-remov (buscar-usuario-activo
-                            (get-dato paradigmadocs 4))
-                            (set-act-list-doc-paradigmadocs paradigmadocs
-                                                            (concatenador (get-dato paradigmadocs 5)
-                                                                    (map set-list-compartido
-                                                                         (filtrador-doc (get-dato paradigmadocs 5)
-                                                                                        (buscar-usuario-activo (get-dato paradigmadocs 4)))))))
-    
-        revokeAllAccesses)
+        ; Caso verdadero: Se filtran los documentos en los que figure el usuario activo como propietario del mismo para luego empleando "map"...
+        ;                 ... se aplica un setter que agrega una lista vacia en la posición de usuarios compartidos para luego anexarla a la...
+        ;                 ... lista de todos los documentos priorizando agregar, entre dos documentos iguales (original y modificado) el modificado...
+        ;                 ... y finalmente eliminar la sesión activa del usuario
+        (set-n-remov (buscar-usuario-activo (get-dato paradigmadocs 4))
+                     (set-act-list-doc-paradigmadocs paradigmadocs
+                                                     (concatenador (get-dato paradigmadocs 5)
+                                                                   (map set-list-compartido
+                                                                        (filtrador-doc (get-dato paradigmadocs 5)
+                                                                                       (buscar-usuario-activo (get-dato paradigmadocs 4)))))))
+        ; Caso falso: No se realiza ninguna operación/cambio sobre la plataforma según lo explicitado en el documento del proyecto
+        paradigmadocs)
     )
   )
 
+; Descripción: Función que permite a un usuario activo en la plataforma buscar documentos en donde exista un texto especifíco y dicho documento...
+;              ... refleje al usuario como propietario y/o usuario compartido. De esta forma, se evalúan todas las versiones de los documentos...
+;              ... considerando los accesos otorgados e implementando la función de forma declarativa empleando la función "filter"
+; Dominio: paradigmadocs X frase
+; Recorrido: Lista
 
 (define search
   (lambda (paradigmadocs)
     (lambda (frase)
-      ; condicional: si existe un usuario activo
+      ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
       (if (buscar-usuario-activo (get-dato paradigmadocs 4))
-          (filter (valido? (buscar-usuario-activo (get-dato paradigmadocs 4))) (filter (llamado-verificador-de-substring frase) (get-dato paradigmadocs 5)))
+          ; Caso verdadero: Se emplea la función filter para aplicar a cada lista correspondiente a un documento contenido en una lista general de los mismos...
+          ;                 ... la función currificada "llamado-verificador-de-substring" la cual, una vez otorgados los parámetros de entrada, llama a la función...
+          ;                 ... "verificador-de-substring" encargada de revisar recursivamente el contenido de todas las versiones del documento extraido...
+          ;                 ... retornando un valor booleando el cual es considerado por la función filter para filtrar dichos documentos que cumplen esta primera...
+          ;                 ... condición. A continuación, las listas resultantes son nuevamente filtradas por un nuevo filter el cual aplica la función...
+          ;                 ... "valido?" la cual se encarga de retornar un valor booleano de acuerdo con si el usuario autenticado figura como propietario y/o...
+          ;                 ... usuario compartido (con un acceso válido del tipo escritura o lectura) para así retornar una lista de documentos los cuales cumplen..
+          ;                 ... todos los requisitos considerando en el enunciado del proyecto
+          (filter (valido? (buscar-usuario-activo (get-dato paradigmadocs 4)))
+                  (filter (llamado-verificador-de-substring frase) (get-dato paradigmadocs 5)))
+          ; Caso falso: Se retorna null según lo explicitado en el documento del proyecto
           null)
       )
     )
   )
 
+; Descripción: Función que permite entregar una representación comprensible para el usuario de la plataforma (tipo paradigmadocs) trabajada. Para ello,...
+;              ... si un usuario autenticado ejecuta la presente función obtendra un string el cual considera los datos de dicho usuario tales como...
+;              ... nombre de usuario, fecha de creación, documentos, versiones, usuarios compartidos y documentos compartidos con el mismo. Por otro lado...
+;              ... Si un usuario no autenticado ejecuta la presente función obtendrá un string el cual considera todo contenido en la plataforma paradigmadocs....
+;              ... Es importante comentar que el string entregado al ser impreso por la función write o display reflejará de forma clara y comprensible los...
+;              ... antecedentes, del mismo modo, el contenido en los documentos (versiones) es desencriptado para la correcta representación
+; Dominio: paradigmadocs
+; Recorrido: string
 
 (define paradigmadocs->string
   (lambda (paradigmadocs)
-    ; condicional: si existe un usuario activo
+    ; ¿Existe un usuario autenticado/logeado/activo en la plataforma?
     (if (buscar-usuario-activo (get-dato paradigmadocs 4))
+        ; Caso verdadero: Mediante recursión y funciones estilo "apply-to-all" se busca, filtra y concatena los datos vinculados al usuario a retornar (string)
         (string-append (usuario->string (get-dato paradigmadocs 4) (buscar-usuario-activo (get-dato paradigmadocs 4)))
                        (string-join (map (documento->string (buscar-usuario-activo (get-dato paradigmadocs 4)))
-                                         (map (filtrador-propietario-compartido (buscar-usuario-activo (get-dato paradigmadocs 4))) (get-dato paradigmadocs 5)))))
+                                         (map (filtrador-propietario-compartido (buscar-usuario-activo (get-dato paradigmadocs 4)))
+                                              (get-dato paradigmadocs 5)))))
+        ; Caso falso: Mediante recursión se concatenan los datos vinculados a la plataforma a retornar (string)
         (string-append "Nombre plataforma: " (get-dato paradigmadocs 0) "\n"
                        "Fecha creación: " (fecha->string (get-dato paradigmadocs 1)) "\n"
                        (string-join (usuarios->string (get-dato paradigmadocs 4)))
                        (string-join (documentos->string (get-dato paradigmadocs 5))))
+        )
     )
-  ))
+  )
   
-; CASO LOG
-; IMPRIMIR USUARIO Y FECHA
-; IMPRIMIR DOCUMENTO Y SUS COMPONENTES (EN ORDEN E "ITERATIVO")
 
-
-
-
-
-
+;--------------------------------------------------------------------------------------------EJEMPLOS--------------------------------------------------------------------------------------------
 ; CREACIÓN DE LA PLATAFORMA PARADIGMADOCS
 
 (define gDocs-0 (paradigmadocs "Paradigmadocs" (date 16 10 2021) encryptFn encryptFn))
@@ -304,6 +369,7 @@
 (define gDocs-24 (login gDocs-23 "user3" "pass3" revokeAllAccesses))
 (define gDocs-25 (login gDocs-24 "user5" "passerronea" revokeAllAccesses))
 
+; Para evitar la sobrecarga de información de la pantalla de interacciones los siguientes ejemplos estarán comentados
 ; EJEMPLOS DE LA FUNCIÓN LOGIN-SEARCH
 
 ;((login gDocs-24 "user1" "pass1" search) "contenido")

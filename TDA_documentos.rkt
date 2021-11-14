@@ -583,7 +583,6 @@
         #f
         ; ¿El primer elemento de la primera lista considerada es equivalente al usuario buscado y su segundo elemento corresponde al permiso y/o acceso de escritura?
         (if (or (and (equal? (get-usuario-compartido (car lista-base)) usuario) (equal? (get-acceso-compartido (car lista-base)) #\r))
-                (and (equal? (get-usuario-compartido (car lista-base)) usuario) (equal? (get-acceso-compartido (car lista-base)) #\c))
                 (and (equal? (get-usuario-compartido (car lista-base)) usuario) (equal? (get-acceso-compartido (car lista-base)) #\w)))
                 #t
             ; Llamado recursivo retornando la función, resto de las listas y el usuario
