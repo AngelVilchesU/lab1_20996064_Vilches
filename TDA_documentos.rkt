@@ -255,8 +255,8 @@
                                                                          (list
                                                                           (list (ID-version-doc (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4) -1)
                                                                                 fecha
-                                                                                (encryptFn
-                                                                                 (string-append (encryptFn (get-dato-doc (get-ultima-version (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)) 2))
+                                                                                ((get-dato paradigmadocs 2)
+                                                                                 (string-append ((get-dato paradigmadocs 3) (get-dato-doc (get-ultima-version (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 4)) 2))
                                                                                                 contenido)))))
                                                                  (get-dato-doc (buscar-Id-documento (get-dato paradigmadocs 5) id-doc) 5))))
             ; ¿El resto de la lista de listas del TDA-documentos es nula?
