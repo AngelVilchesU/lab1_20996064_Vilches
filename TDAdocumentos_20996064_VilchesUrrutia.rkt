@@ -1,8 +1,8 @@
 #lang racket
 
-(require "TDA_fecha.rkt")
-(require "TDA_paradigmadocs.rkt")
-(require "TDA_usuarios.rkt")
+(require "TDAfecha_20996064_VilchesUrrutia.rkt")
+(require "TDAparadigmadocs_20996064_VilchesUrrutia.rkt")
+(require "TDAusuarios_20996064_VilchesUrrutia.rkt")
 
 ; Implementación del TDA documento
 
